@@ -7,11 +7,14 @@
         <link href="app.css" rel="stylesheet">
     </head>
     <body>
-        <div id="searchBar"></div>
+        <div id="searchBar">
+            <h1>Neighborhood Map</h1>
+        </div>
         <div id="map"></div>
 
         <!-- Javascript -->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap" async defer></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
         <script type="text/javascript "src="app.js"></script>
     </body>
 </html>
