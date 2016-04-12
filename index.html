@@ -7,10 +7,19 @@
         <link href="app.css" rel="stylesheet">
     </head>
     <body>
-        <div id="searchBar">
+        <header>
             <h1>Neighborhood Map</h1>
-        </div>
-        <div id="map"></div>
+        </header>
+        <main>
+            <section id="list">
+                <input type="text"/>
+                <ul data-bind="foreach: places">
+                    <li data-bind="text: name"></li>
+                </ul>
+            </section>
+            <section id="map"></section>
+        </main>
+
 
         <!-- Javascript -->
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer></script>
