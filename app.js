@@ -5,8 +5,28 @@ var service;
 var searched = false;
 
 var viewModel = {
+    filter: ko.observable(""),
     places: ko.observableArray([])
 };
+
+viewModel.filter.subscribe(function(newValue){
+    console.log(newValue);
+    filterPlaces(newValue);
+});
+
+function filterPlaces(value) {
+    var regex = new RegExp(value, "i");
+    viewModel.places().forEach(function(place){
+        if(place.name.search(regex) == -1){
+            place.show(false);
+            place.marker.setVisible(false);
+        } else {
+            place.show(true);
+            place.marker.setVisible(true);
+        }
+    });
+}
+
 ko.applyBindings(viewModel);
 
 //Geolocation
@@ -66,7 +86,7 @@ function radarSearchCallBack(results, status) {
         console.error(status);
         return;
     }
-    for (var i = 0; i <= 10; i++) {
+    for (var i = 0; i < 10; i++) {
         addMarker(results[i]);
     }
 }
@@ -86,6 +106,8 @@ function addMarker(place) {
             console.error(status);
             return;
         } else {
+            result.marker = marker;
+            result.show = ko.observable(true);
             viewModel.places.push(result);
         }
     });
