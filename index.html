@@ -12,7 +12,7 @@
         </header>
         <main>
             <section id="list">
-                <input type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
+                <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
                 <ul data-bind="foreach: places">
                     <li data-bind="text: name, visible: show"></li>
                 </ul>

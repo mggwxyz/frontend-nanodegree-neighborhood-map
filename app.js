@@ -6,18 +6,19 @@ var searched = false;
 
 var viewModel = {
     filter: ko.observable(""),
+    status: ko.observable(""),
     places: ko.observableArray([])
 };
 
-viewModel.filter.subscribe(function(newValue){
+viewModel.filter.subscribe(function(newValue) {
     console.log(newValue);
     filterPlaces(newValue);
 });
 
 function filterPlaces(value) {
     var regex = new RegExp(value, "i");
-    viewModel.places().forEach(function(place){
-        if(place.name.search(regex) == -1){
+    viewModel.places().forEach(function(place) {
+        if (place.name.search(regex) == -1) {
             place.show(false);
             place.marker.setVisible(false);
         } else {
@@ -66,7 +67,7 @@ function finishInit() {
 };
 
 function performRadarSearch() {
-    if(!searched){
+    if (!searched) {
         console.log("performRadarSearch called...");
         var req = {
             bounds: map.getBounds(),
@@ -113,6 +114,10 @@ function addMarker(place) {
     });
 
     google.maps.event.addListener(marker, 'click', function() {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function(){
+            marker.setAnimation(null);
+        }, 700);
         service.getDetails(place, function(result, status) {
             if (status !== google.maps.places.PlacesServiceStatus.OK) {
                 console.error(status);
