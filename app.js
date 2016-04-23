@@ -54,7 +54,8 @@ function geoError(error) {
             lat: 38.9072,
             lng: -77.0369
         },
-        zoom: 12
+        zoom: 12,
+        mapTypeControl: false
     });
     finishInit();
 };
@@ -87,7 +88,7 @@ function radarSearchCallBack(results, status) {
         console.error(status);
         return;
     }
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
         addMarker(results[i]);
     }
 }
@@ -127,4 +128,16 @@ function addMarker(place) {
             infoWindow.open(map, marker);
         });
     });
+}
+
+function toggleMenu(){
+    var logo = document.getElementById("logo");
+    var menu = document.getElementById("menu");
+    if (logo.className === "logo logo-open"){
+        logo.className = "logo logo-close";
+        menu.className = "menu-close";
+    } else {
+        logo.className = "logo logo-open";
+        menu.className = "menu-open";
+    }
 }
