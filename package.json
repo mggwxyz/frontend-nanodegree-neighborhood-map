@@ -1,0 +1,22 @@
+{
+  "name": "neighborhood-map",
+  "version": "1.0.0",
+  "description": "Udacity Neighborhood Map",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mgg9xv/neighborhood-map.git"
+  },
+  "author": "Michael Gilbertson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mgg9xv/neighborhood-map/issues"
+  },
+  "homepage": "https://github.com/mgg9xv/neighborhood-map#readme",
+  "devDependencies": {
+    "oauth-signature": "^1.3.1"
+  }
+}

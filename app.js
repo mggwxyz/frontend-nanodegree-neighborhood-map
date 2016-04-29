@@ -1,20 +1,25 @@
+//Global variables
 var map;
 var userPosition;
 var infoWindow;
 var service;
 var searched = false;
+var LAT = 38.9072;
+var LNG = -77.0369;
 
+//KO Simple View Model
 var viewModel = {
     filter: ko.observable(""),
     status: ko.observable(""),
     places: ko.observableArray([])
 };
 
+//KO Subscription that watches the filter observable and filters places from list
 viewModel.filter.subscribe(function(newValue) {
-    console.log(newValue);
     filterPlaces(newValue);
 });
 
+//Function that removes places from list and map base on filter entered
 function filterPlaces(value) {
     var regex = new RegExp(value, "i");
     viewModel.places().forEach(function(place) {
@@ -28,9 +33,10 @@ function filterPlaces(value) {
     });
 }
 
+//Applying the bindings to the view model
 ko.applyBindings(viewModel);
 
-//Geolocation
+//Init Map function
 function initMap() {
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 }
@@ -51,8 +57,8 @@ function geoError(error) {
     console.log("Geolocation Error: " + error.code);
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
-            lat: 38.9072,
-            lng: -77.0369
+            lat: LAT,
+            lng: LNG
         },
         zoom: 12,
         mapTypeControl: false
@@ -88,7 +94,7 @@ function radarSearchCallBack(results, status) {
         console.error(status);
         return;
     }
-    for (var i = 0; i < 12; i++) {
+    for (var i = 0; i < 10; i++) {
         addMarker(results[i]);
     }
 }
@@ -116,7 +122,7 @@ function addMarker(place) {
 
     google.maps.event.addListener(marker, 'click', function() {
         marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(function(){
+        setTimeout(function() {
             marker.setAnimation(null);
         }, 700);
         service.getDetails(place, function(result, status) {
@@ -130,10 +136,60 @@ function addMarker(place) {
     });
 }
 
-function toggleMenu(){
+function getYelpPlaces() {
+
+    var YELP_KEY = "pV7R7vzUXJEFfl3Dj4retQ",
+        YELP_TOKEN = "VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL",
+        YELP_KEY_SECRET = "t4CQ3YyzkgP26-lDGp1pVoLOFks",
+        YELP_TOKEN_SECRET = "SB5H01fW3LCNi3qyO7uaJ59DK9U";
+
+    var yelp_url = 'https://api.yelp.com/v2/search';
+
+    function nonce_generate() {
+        return (Math.floor(Math.random() * 1e12).toString());
+    }
+
+    var parameters = {
+        oauth_consumer_key: YELP_KEY,
+        oauth_token: YELP_TOKEN,
+        oauth_nonce: nonce_generate(),
+        oauth_timestamp: Math.floor(Date.now() / 1000),
+        oauth_signature_method: 'HMAC-SHA1',
+        oauth_version: '1.0',
+        callback: 'cb',
+        term: 'art',
+        category_filter: 'galleries',
+        location: 'Washington, DC',
+        cll : LAT + ',' + LNG
+    };
+
+    var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
+    parameters.oauth_signature = encodedSignature;
+
+    var settings = {
+        url: yelp_url,
+        data: parameters,
+        cache: true,
+        dataType: 'jsonp',
+        success: function(result){
+            console.log("Success: " + result);
+            console.log(result);
+        },
+        error: function(result) {
+            console.log("Error: " + result);
+        }
+    };
+
+    // Send AJAX query via jQuery library.
+    $.ajax(settings);
+}
+
+
+
+function toggleMenu() {
     var logo = document.getElementById("logo");
     var menu = document.getElementById("menu");
-    if (logo.className === "logo logo-open"){
+    if (logo.className === "logo logo-open") {
         logo.className = "logo logo-close";
         menu.className = "menu-close";
     } else {

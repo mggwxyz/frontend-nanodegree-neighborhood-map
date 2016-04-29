@@ -15,10 +15,9 @@ h1 {
 header {
     background-color: #cfaaed ;
     color: #000000;
-    flex-basis: 10%;
+    height: 60px;
     width: 100%;
     display: flex;
-    flex-grow: 1;
     justify-content: space-between;
 }
 
