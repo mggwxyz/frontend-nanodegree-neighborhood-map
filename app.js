@@ -172,19 +172,18 @@ function addMarker(place) {
         setTimeout(function() {
             marker.setAnimation(null);
         }, 700);
-        infoWindow.setContent(place.name);
-        infoWindow.open(map, marker);
+        getYelpPlace(place.id, marker);
     });
 }
 
-function getYelpPlaces() {
+function getYelpPlace(placeId, marker) {
 
     var YELP_KEY = "pV7R7vzUXJEFfl3Dj4retQ",
         YELP_TOKEN = "VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL",
         YELP_KEY_SECRET = "t4CQ3YyzkgP26-lDGp1pVoLOFks",
         YELP_TOKEN_SECRET = "SB5H01fW3LCNi3qyO7uaJ59DK9U";
 
-    var yelp_url = 'https://api.yelp.com/v2/search';
+    var yelp_url = 'https://api.yelp.com/v2/business/' + placeId;
 
     function nonce_generate() {
         return (Math.floor(Math.random() * 1e12).toString());
@@ -198,10 +197,6 @@ function getYelpPlaces() {
         oauth_signature_method: 'HMAC-SHA1',
         oauth_version: '1.0',
         callback: 'cb',
-        term: 'art',
-        category_filter: 'galleries',
-        location: 'Washington, DC',
-        cll: LAT + ',' + LNG
     };
 
     var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
@@ -212,12 +207,16 @@ function getYelpPlaces() {
         data: parameters,
         cache: true,
         dataType: 'jsonp',
-        success: function(results) {
-            console.log("Success: " + results);
-            console.log(results);
-            for (var i = 0; i < 10; i++) {
-                addMarker(results.businesses[i]);
-            }
+        success: function(result) {
+            console.log("Success: " + result);
+            console.log(result);
+            var node = document.createElement('DIV');
+            node.innerHTML = "<img src='" + result.snippet_image_url + "'/>"
+                + "Name: " + result.name + "<br>"
+                + "Phone: " + result.display_phone + "<br>"
+                + "Rating: " + result.rating ;
+            infoWindow.setContent(node);
+            infoWindow.open(map, marker);
         },
         error: function(result) {
             console.log("Error: " + result);
@@ -228,18 +227,11 @@ function getYelpPlaces() {
     $.ajax(settings);
 }
 
-
-
 function toggleMenu() {
-    var logo = document.getElementById("logo");
-    var menu = document.getElementById("menu");
-    if (logo.className === "logo logo-open") {
-        logo.className = "logo logo-close";
-        menu.className = "menu-close";
-    } else {
-        logo.className = "logo logo-open";
-        menu.className = "menu-open";
-    }
+    var logo = $("#logo");
+    var menu = $("#menu");
+    logo.toggleClass('logo-close');
+    menu.toggleClass('menu-close');
 }
 
 window.onerror = function(errorMsg, url, lineNumber) {

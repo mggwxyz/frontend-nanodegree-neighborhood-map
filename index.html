@@ -7,19 +7,19 @@
         <link href="app.css" rel="stylesheet">
     </head>
     <body>
-        <section id="menu" class="menu-open">
-            <header>
-                <h1>Neighborhood Map</h1>
-                <img id="logo" onclick="toggleMenu()" class="logo" src="hamburger.svg" alt="menu"/>
-            </header>
-            <div id="filter-container">
-                <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
-            </div>
-            <ul data-bind="foreach: places">
-                <li data-bind="text: name, visible: show"></li>
-            </ul>
-        </section>
         <main>
+            <section id="menu" class="menu">
+                <header>
+                    <h1>Neighborhood Map</h1>
+                    <img id="logo" onclick="toggleMenu()" class="logo" src="hamburger.svg" alt="menu"/>
+                </header>
+                <div id="filter-container">
+                    <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
+                </div>
+                <ul data-bind="foreach: places">
+                    <li data-bind="text: name, visible: show"></li>
+                </ul>
+            </section>
             <section id="map"></section>
         </main>
 
