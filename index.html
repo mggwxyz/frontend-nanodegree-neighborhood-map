@@ -10,9 +10,11 @@
         <section id="menu" class="menu-open">
             <header>
                 <h1>Neighborhood Map</h1>
-                <img id="logo" onclick="toggleMenu()" class="logo logo-open" src="hamburger.svg" alt="menu"/>
+                <img id="logo" onclick="toggleMenu()" class="logo" src="hamburger.svg" alt="menu"/>
             </header>
-            <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
+            <div id="filter-container">
+                <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
+            </div>
             <ul data-bind="foreach: places">
                 <li data-bind="text: name, visible: show"></li>
             </ul>
@@ -23,10 +25,10 @@
 
 
         <!-- Javascript -->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer></script>
         <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
         <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
         <script src="node_modules/oauth-signature/dist/oauth-signature.min.js"></script>
         <script type="text/javascript "src="app.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer></script>
     </body>
 </html>

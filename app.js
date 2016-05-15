@@ -1,11 +1,81 @@
 //Global variables
-var map;
-var userPosition;
-var infoWindow;
-var service;
+var map, userPosition, infoWindow, service;
 var searched = false;
 var LAT = 38.9072;
 var LNG = -77.0369;
+
+//Hard-Coded Destinations
+var defaultPlaces = [{
+    "id": "national-gallery-of-art-washington",
+    "name": "National Gallery of Art",
+    "location": {
+        "latitude": 38.8913416579172,
+        "longitude": -77.0198351875512
+    }
+}, {
+    "id": "hirshhorn-museum-and-sculpture-garden-washington-2",
+    "name": "Hirshhorn Museum & Sculpture Garden",
+    "location": {
+        "latitude": 38.8875699,
+        "longitude": -77.02191
+    }
+}, {
+    "id": "bloombars-washington",
+    "name": "BloomBars",
+    "location": {
+        "latitude": 38.930202,
+        "longitude": -77.028114
+    }
+}, {
+    "id": "freer-gallery-of-art-and-arthur-m-sackler-gallery-washington",
+    "name": "Freer Gallery of Art and Arthur M Sackler Gallery",
+    "location": {
+        "latitude": 38.8875252753496,
+        "longitude": -77.0265506207943
+    }
+}, {
+    "id": "the-fridge-washington",
+    "name": "The Fridge",
+    "location": {
+        "latitude": 38.88213,
+        "longitude": -76.994232
+    }
+}, {
+    "id": "national-gallery-of-art-sculpture-garden-washington-2",
+    "name": "National Gallery of Art Sculpture Garden",
+    "location": {
+        "latitude": 38.8912975692515,
+        "longitude": -77.022959356414
+    }
+}, {
+    "id": "toro-mata-washington",
+    "name": "Toro Mata",
+    "location": {
+        "latitude": 38.92099,
+        "longitude": -77.04238
+    }
+}, {
+    "id": "the-smithsonian-institution-washington",
+    "name": "The Smithsonian Institution",
+    "location": {
+        "latitude": 38.8889236,
+        "longitude": -77.0261612
+    }
+}, {
+    "id": "artists-proof-washington-2",
+    "name": "Artist's Proof",
+    "location": {
+        "latitude": 38.910091,
+        "longitude": -77.064407
+    }
+}, {
+    "id": "the-phillips-collection-washington-3",
+    "name": "The Phillips Collection",
+    "location": {
+        "latitude": 38.911477119043,
+        "longitude": -77.0468060633715
+    }
+}];
 
 //KO Simple View Model
 var viewModel = {
@@ -37,102 +107,73 @@ function filterPlaces(value) {
 ko.applyBindings(viewModel);
 
 //Init Map function
-function initMap() {
+var initMap = function() {
+    console.log("Starting initMap()...")
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+
+    function geoSuccess(position) {
+        userPosition = position;
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {
+                lat: userPosition.coords.latitude,
+                lng: userPosition.coords.longitude
+            },
+            zoom: 12,
+            mapTypeControl: false
+        });
+        finishInit();
+    };
+
+    function geoError(error) {
+        console.log("Geolocation Error: " + error.code);
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {
+                lat: LAT,
+                lng: LNG
+            },
+            zoom: 12,
+            mapTypeControl: false
+        });
+        finishInit();
+    };
+
+    function finishInit() {
+        console.log("finishInit called...");
+        infoWindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map);
+        placeMarkers();
+    };
+
+
 }
 
-function geoSuccess(position) {
-    userPosition = position;
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {
-            lat: userPosition.coords.latitude,
-            lng: userPosition.coords.longitude
-        },
-        zoom: 12
-    });
-    finishInit();
+function placeMarkers(){
+    defaultPlaces.forEach(function(place){
+        addMarker(place);
+    })
 };
-
-function geoError(error) {
-    console.log("Geolocation Error: " + error.code);
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {
-            lat: LAT,
-            lng: LNG
-        },
-        zoom: 12,
-        mapTypeControl: false
-    });
-    finishInit();
-};
-
-function finishInit() {
-    console.log("finishInit called...");
-    infoWindow = new google.maps.InfoWindow();
-    service = new google.maps.places.PlacesService(map);
-    map.addListener('idle', performRadarSearch);
-};
-
-function performRadarSearch() {
-    if (!searched) {
-        console.log("performRadarSearch called...");
-        var req = {
-            bounds: map.getBounds(),
-            keyword: 'art',
-            types: ['art_gallery']
-        };
-        searched = true;
-        service.radarSearch(req, radarSearchCallBack);
-    } else {
-        //do nothing;
-    }
-}
-
-function radarSearchCallBack(results, status) {
-    console.log("radarSearchCallBack called...");
-    if (status !== google.maps.places.PlacesServiceStatus.OK) {
-        console.error(status);
-        return;
-    }
-    for (var i = 0; i < 10; i++) {
-        addMarker(results[i]);
-    }
-}
 
 function addMarker(place) {
     var marker = new google.maps.Marker({
         map: map,
-        position: place.geometry.location,
-        icon: {
-            url: 'http://maps.gstatic.com/mapfiles/circle.png',
-            anchor: new google.maps.Point(10, 10),
-            scaledSize: new google.maps.Size(10, 17)
-        }
+        position: {
+            lng: place.location.longitude,
+            lat: place.location.latitude
+        },
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
     });
-    service.getDetails(place, function(result, status) {
-        if (status !== google.maps.places.PlacesServiceStatus.OK) {
-            console.error(status);
-            return;
-        } else {
-            result.marker = marker;
-            result.show = ko.observable(true);
-            viewModel.places.push(result);
-        }
-    });
+
+    place.marker = marker;
+    place.show = ko.observable(true);
+    viewModel.places.push(place);
 
     google.maps.event.addListener(marker, 'click', function() {
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
             marker.setAnimation(null);
         }, 700);
-        service.getDetails(place, function(result, status) {
-            if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                console.error(status);
-                return;
-            }
-            infoWindow.setContent(result.name);
-            infoWindow.open(map, marker);
-        });
+        infoWindow.setContent(place.name);
+        infoWindow.open(map, marker);
     });
 }
 
@@ -160,7 +201,7 @@ function getYelpPlaces() {
         term: 'art',
         category_filter: 'galleries',
         location: 'Washington, DC',
-        cll : LAT + ',' + LNG
+        cll: LAT + ',' + LNG
     };
 
     var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
@@ -171,9 +212,12 @@ function getYelpPlaces() {
         data: parameters,
         cache: true,
         dataType: 'jsonp',
-        success: function(result){
-            console.log("Success: " + result);
-            console.log(result);
+        success: function(results) {
+            console.log("Success: " + results);
+            console.log(results);
+            for (var i = 0; i < 10; i++) {
+                addMarker(results.businesses[i]);
+            }
         },
         error: function(result) {
             console.log("Error: " + result);
@@ -196,4 +240,12 @@ function toggleMenu() {
         logo.className = "logo logo-open";
         menu.className = "menu-open";
     }
+}
+
+window.onerror = function(errorMsg, url, lineNumber) {
+    document.body.innerHTML = '<div class="errorPage"><div class="errorMessage">'
+    + 'Uh oh! Something went wrong. Try refreshing the page.<br>'
+    + errorMsg
+    + '</div></div>';
+    return true;
 }
