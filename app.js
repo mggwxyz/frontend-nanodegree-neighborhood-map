@@ -134,11 +134,18 @@ var initMap = function() {
             zoom: 12,
             mapTypeControl: false
         });
+        userPosition = {
+            coords: {
+                latitude: LAT,
+                longitude: LNG
+            }
+        };
         finishInit();
     };
 
     function finishInit() {
         console.log("finishInit called...");
+
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
         placeMarkers();
@@ -211,27 +218,40 @@ function getYelpPlace(placeId, marker) {
             console.log("Success: " + result);
             console.log(result);
             var node = document.createElement('DIV');
-            node.innerHTML = "<img src='" + result.snippet_image_url + "'/>"
-                + "Name: " + result.name + "<br>"
-                + "Phone: " + result.display_phone + "<br>"
-                + "Rating: " + result.rating ;
+            node.innerHTML = "<div class='place-container'><div class='place-image'>"
+                + "<img src='" + result.image_url + "'/>"
+                + "</div><div class='place-info'>"
+                + "<p><strong>Name:</strong> " + result.name + "</p><br>"
+                + "<p><strong>Phone:</strong> " + result.display_phone + "</p><br>"
+                + "<p><strong>Rating:</strong> " + result.rating + "</p>"
+                + "</div></div>";
             infoWindow.setContent(node);
-            infoWindow.open(map, marker);
         },
         error: function(result) {
             console.log("Error: " + result);
+            infoWindow.setContent("Error loading data.");
+
         }
     };
+
+    infoWindow.open(map, marker);
+    infoWindow.setContent("Loading...");
 
     // Send AJAX query via jQuery library.
     $.ajax(settings);
 }
 
 function toggleMenu() {
-    var logo = $("#logo");
+    var mapDiv = $("#map");
     var menu = $("#menu");
-    logo.toggleClass('logo-close');
+    mapDiv.toggleClass('map-close');
     menu.toggleClass('menu-close');
+    setTimeout(function () {
+            google.maps.event.trigger(map, 'resize');
+            map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+            // map.setCenter({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+            console.log("recentering...")
+    }, 500);
 }
 
 window.onerror = function(errorMsg, url, lineNumber) {

@@ -1,7 +1,7 @@
 html, body {
     width: 100%;
     height: 100%;
-    font-size: 3vw;
+    font-size: 4vw;
     font-family: Helvetica;
     box-sizing: border-box;
     margin: 0;
@@ -64,21 +64,21 @@ main {
     background-color: white;
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     z-index: 2;
-    transition-property: top, right;
-    transition-duration: 1s;
-    transition-timing-function: ease-out;
+    transition-property: top, left;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
 }
 
 .menu-close {
     position: absolute;
     top: 0;
-    right: 100vw;
+    left: -400px;
     z-index: 2;
-    transition-property: top, right;
-    transition-duration: 1s;
-    transition-timing-function: ease-out;
+    transition-property: top, left;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
 }
 
 ul {
@@ -96,7 +96,7 @@ li {
     border-top: 1px solid grey;
 }
 
-li:first-child {
+ul > li:first-child {
     border-top: 0px solid grey;
 }
 
@@ -106,10 +106,22 @@ li:hover {
     color: white
 }
 
-#map {
+.map {
+    float: right;
     width: 100%;
     height: 100%;
+    transition-property: width;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
 }
+
+.map-close {
+    width: calc(100% - 400px);
+    transition-property: width;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+}
+
 
 .logo {
     position: relative;
@@ -124,12 +136,34 @@ li:hover {
     border-radius: 0.5rem;
 }
 
+.map-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3rem;
+    height: 3rem;
+    padding: 1rem;
+    background-color: #555555;
+    border-radius: 0.5rem;
+    margin: 1rem;
+}
+
 .logo-close {
     transform: none;
     position: fixed;
     top: 0;
     left: 0;
     margin: 0.5rem;
+}
+
+.place-container {
+    z-index: 1;
+}
+
+.place-image, .place-info {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0.5rem;
 }
 
 .errorMessage {
@@ -156,25 +190,25 @@ li:hover {
         font-size: 16px;
         font-family: Helvetica;
     }
-    #menu {
+    /*#menu {
         display: inline-block;
         position: static;
         z-index: 0;
         vertical-align:top;
-    }
+    }*/
 
-    #map {
+    /*#map {
         display: inline-block;
         width: calc(100% - (410px));
         height: 100%;
         z-index: 0;
         vertical-align:top;
-    }
+    }*/
 
-    .menu-close {
+    /*.menu-close {
         position: absolute;
         top: 0;
         right: 400px;
         z-index: 2;
-    }
+    }*/
 }
