@@ -4,14 +4,16 @@
         <title>Neighborhood Map</title>
         <meta name="viewport" content="initial-scale=1.0">
         <meta charset="utf-8">
+        <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
         <link href="app.css" rel="stylesheet">
     </head>
     <body>
         <main>
             <section id="menu" class="menu">
                 <header>
+                    <a href="https://github.com/mgg9xv/neighborhood-map"><img id="github-icon" class="github-icon" src="github-icon.svg" alt="github icon"/></a>
                     <h1>Neighborhood Map</h1>
-                    <img id="logo" onclick="toggleMenu()" class="logo" src="hamburger.svg" alt="menu"/>
+                    <img id="map-icon" onclick="toggleMenu()" class="map-icon" src="map-icon.svg" alt="map icon"/>
                 </header>
                 <div id="filter-container">
                     <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
@@ -21,7 +23,7 @@
                 </ul>
             </section>
             <section id="map" class="map map-close"></section>
-            <img id="logo" onclick="toggleMenu()" class="map-icon" src="map-icon.svg" alt="menu"/>
+            <img id="menu-icon" onclick="toggleMenu()" class="menu-icon" src="hamburger.svg" alt="menu icon"/>
         </main>
 
 
