@@ -221,9 +221,10 @@ function getYelpPlace(placeId, marker) {
             node.innerHTML = "<div class='place-container'><div class='place-image'>"
                 + "<img src='" + result.image_url + "'/>"
                 + "</div><div class='place-info'>"
-                + "<p><strong>Name:</strong> " + result.name + "</p><br>"
-                + "<p><strong>Phone:</strong> " + result.display_phone + "</p><br>"
+                + "<p><strong>Name:</strong> " + result.name + "</p>"
+                + "<p><strong>Phone:</strong> " + result.display_phone + "</p>"
                 + "<p><strong>Rating:</strong> " + result.rating + "</p>"
+                + "<p><a href='" + result.url + "'>Find Out More</a></p>"
                 + "</div></div>";
             infoWindow.setContent(node);
         },
@@ -235,7 +236,7 @@ function getYelpPlace(placeId, marker) {
     };
 
     infoWindow.open(map, marker);
-    infoWindow.setContent("Loading...");
+    infoWindow.setContent("Loading Yelp Data...");
 
     // Send AJAX query via jQuery library.
     $.ajax(settings);

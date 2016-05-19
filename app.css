@@ -210,6 +210,10 @@ li:hover {
     background-color: #11ccee;
 }
 
+p {
+    padding: 0.2rem 0rem;
+}
+
 @media screen and (min-width: 400px) {
     html, body {
         width: 100%;
