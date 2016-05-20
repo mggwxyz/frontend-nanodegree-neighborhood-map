@@ -81,7 +81,10 @@ var defaultPlaces = [{
 var viewModel = {
     filter: ko.observable(""),
     status: ko.observable(""),
-    places: ko.observableArray([])
+    places: ko.observableArray([]),
+    getYelpInfo: function(place){
+        getYelpPlace(place.id, place.marker);
+    }
 };
 
 //KO Subscription that watches the filter observable and filters places from list
@@ -157,10 +160,11 @@ var initMap = function() {
 function placeMarkers(){
     defaultPlaces.forEach(function(place){
         addMarker(place);
-    })
+    });
 };
 
 function addMarker(place) {
+    console.log("creating marker for " + place.id);
     var marker = new google.maps.Marker({
         map: map,
         position: {
@@ -170,21 +174,26 @@ function addMarker(place) {
         icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
     });
 
+    console.log("about to add listener for " + place.id);
+    marker.addListener('click', openMarker);
     place.marker = marker;
     place.show = ko.observable(true);
     viewModel.places.push(place);
 
-    google.maps.event.addListener(marker, 'click', function() {
+    function openMarker() {
+        console.log("click function called");
+        map.setCenter(marker.getPosition());
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
             marker.setAnimation(null);
         }, 700);
         getYelpPlace(place.id, marker);
-    });
+    }
 }
 
 function getYelpPlace(placeId, marker) {
 
+    console.log("called getYelpPlace() for " + placeId );
     var YELP_KEY = "pV7R7vzUXJEFfl3Dj4retQ",
         YELP_TOKEN = "VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL",
         YELP_KEY_SECRET = "t4CQ3YyzkgP26-lDGp1pVoLOFks",
@@ -237,6 +246,7 @@ function getYelpPlace(placeId, marker) {
 
     infoWindow.open(map, marker);
     infoWindow.setContent("Loading Yelp Data...");
+    map.panTo(marker.getPosition());
 
     // Send AJAX query via jQuery library.
     $.ajax(settings);
@@ -250,7 +260,6 @@ function toggleMenu() {
     setTimeout(function () {
             google.maps.event.trigger(map, 'resize');
             map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
-            // map.setCenter({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
             console.log("recentering...")
     }, 500);
 }

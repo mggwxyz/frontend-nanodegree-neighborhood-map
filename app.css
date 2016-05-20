@@ -50,6 +50,7 @@ main {
     width: 100%;
     padding: 1rem 0.5rem;
     background-color: white;
+    border-bottom: 0.2rem solid lightgrey;
 }
 #filter {
     width: 100%;
@@ -88,30 +89,29 @@ main {
 
 ul {
     font-size: 1rem;
-    list-style: none;
     height: calc(100% - 11rem);
     margin: 0;
-    padding: 0.5rem;
+    padding: 0;
     overflow-y: scroll;
+    color: #222222;
     background-color: #eeeeee;
+    list-style-type: none;
 }
 
 li {
-    display: block;
-    padding: 1rem;
-    color: #222222;
     background-color: #eeeeee;
-    border-top: 1px solid grey;
+    color: lightgrey;
 }
 
-ul > li:first-child {
-    border-top: 0px solid grey;
+.list-item {
+    display: block;
+    padding: 1rem 1rem;
+    color: #222222;
+    text-decoration: none;
 }
-
 
 li:hover {
     background-color: lightblue;
-    color: white
 }
 
 .map {
@@ -185,12 +185,21 @@ li:hover {
 
 .place-container {
     z-index: 1;
+    width: 20rem;
 }
 
 .place-image, .place-info {
     display: inline-block;
     vertical-align: middle;
     padding: 0.5rem;
+}
+
+.place-image {
+    width: 40%;
+}
+
+.place-info {
+    width: 60%;
 }
 
 .errorMessage {
@@ -213,6 +222,7 @@ li:hover {
 p {
     padding: 0.2rem 0rem;
 }
+
 
 @media screen and (min-width: 400px) {
     html, body {

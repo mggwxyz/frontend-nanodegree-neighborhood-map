@@ -19,7 +19,7 @@
                     <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
                 </div>
                 <ul data-bind="foreach: { data: places , as: 'place'}">
-                    <a data-bind="click: getYelpPlace(place.id, place.marker)"onclick=""><li data-bind="text: place.name, visible: place.show"></li><a>
+                    <div><li data-bind="if: place.show"><a class="list-item" data-bind="click: $parent.getYelpInfo, text: place.name" href=""></a></li>
                 </ul>
             </section>
             <section id="map" class="map map-close"></section>
