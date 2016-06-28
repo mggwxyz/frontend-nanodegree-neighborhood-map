@@ -258,9 +258,9 @@ function toggleMenu() {
     mapDiv.toggleClass('map-close');
     menu.toggleClass('menu-close');
     setTimeout(function () {
-            google.maps.event.trigger(map, 'resize');
-            map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
-            console.log("recentering...")
+        google.maps.event.trigger(map, 'resize');
+        map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+        console.log("recentering...");
     }, 500);
 }
 
