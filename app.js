@@ -83,6 +83,11 @@ var viewModel = {
     status: ko.observable(""),
     places: ko.observableArray([]),
     getYelpInfo: function(place){
+        //check to see if screen is small and menu is open
+        if(window.innerWidth < 500 && !$('#menu').hasClass("menu-close")){
+            console.log("Closing menu");
+            toggleMenu();
+        }
         getYelpPlace(place.id, place.marker);
     }
 };
