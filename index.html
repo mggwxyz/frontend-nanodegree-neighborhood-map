@@ -11,16 +11,29 @@
         <main>
             <section id="menu" class="menu">
                 <header>
-                    <a href="https://github.com/mgg9xv/neighborhood-map"><img id="github-icon" class="github-icon" src="images/github-icon.svg" alt="github icon"/></a>
+                    <a href="https://github.com/mgg9xv/neighborhood-map">
+                        <img id="github-icon" class="github-icon" src="images/github-icon.svg" alt="github icon"/>
+                    </a>
                     <h1>Neighborhood Map</h1>
                     <img id="map-icon" onclick="toggleMenu()" class="map-icon" src="images/map-icon.svg" alt="map icon"/>
                 </header>
-                <div id="filter-container">
-                    <input id="filter" type="text" placeholder="Filter places..."/ data-bind="textInput: filter">
-                </div>
-                <ul data-bind="foreach: { data: places , as: 'place'}">
-                    <div><li data-bind="if: place.show"><a class="list-item" data-bind="click: $parent.getYelpInfo, text: place.name" href=""></a></li>
-                </ul>
+                <section id="input-pane">
+                    <div class="input-container">
+                        <label for="search">Search </label><input id="search" name="search" type="text" placeholder="Ex. restaurant, art, library, etc." data-bind="textInput: search">
+                    </div>
+                    <div class="input-container">
+                        <label for="filter">Filter </label><input id="filter" for="filter" type="text" placeholder="Enter text to filter out places..."/ data-bind="textInput: filter">
+                    </div>
+                </section>
+                <section id="places-pane">
+                    <ul data-bind="foreach: { data: places , as: 'place'}">
+                        <li data-bind="if: place.show">
+                            <a data-bind="click: $parent.getYelpInfo" href="">
+                                <div class="bullet">&#9702;</div><div class="place-name" data-bind="text: place.name"></div>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
             </section>
             <section id="map" class="map map-close"></section>
             <img id="menu-icon" onclick="toggleMenu()" class="menu-icon" src="images/hamburger.svg" alt="menu icon"/>
