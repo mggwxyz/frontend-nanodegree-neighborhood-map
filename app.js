@@ -223,6 +223,8 @@ function addMarker(place) {
 }
 
 function YelpHelper(){
+
+    var xhr;
     var YELP_KEY = "pV7R7vzUXJEFfl3Dj4retQ",
         YELP_TOKEN = "VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL",
         YELP_KEY_SECRET = "t4CQ3YyzkgP26-lDGp1pVoLOFks",
@@ -285,6 +287,10 @@ function YelpHelper(){
 
     function getYelpPlaces(term) {
 
+        if(xhr && xhr.readyState != 4){
+            xhr.abort();
+        }
+
         var center = map.getCenter();
 
         var yelp_url = 'https://api.yelp.com/v2/search';
@@ -331,7 +337,7 @@ function YelpHelper(){
         };
 
         // Send AJAX query via jQuery library.
-        $.ajax(settings);
+        xhr = $.ajax(settings);
     }
 
     return {

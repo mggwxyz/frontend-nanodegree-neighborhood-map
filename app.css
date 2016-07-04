@@ -9,7 +9,6 @@ html, body {
     border: 0;
 }
 
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -67,6 +66,7 @@ label {
     text-align: center;
     padding: 0.5rem;
     width: 20%;
+    font-weight: bold;
 }
 
 input {
@@ -140,7 +140,6 @@ li {
     text-decoration: none;
     margin: 0.5rem;
     border-radius: 0.1rem;
-    border: 1px gray solid;
 }
 
 li:hover {
