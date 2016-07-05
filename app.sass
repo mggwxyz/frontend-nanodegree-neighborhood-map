@@ -1,6 +1,7 @@
 $dark-color: #1e77e2
 $light-grey: #aaaaaa
 $light-blue: #7cb3f5
+$light-orange: #f9d48e
 $indie: 'Indie Flower', cursive
 $titillium: 'Titillium Web', sans-serif
 
@@ -164,8 +165,10 @@ li
 
 
 li:hover
-    background-color: #f9c156
+    background-color: $light-orange
 
+li:hover > a > div.place-name
+    color: #000000
 
 .map
     float: right

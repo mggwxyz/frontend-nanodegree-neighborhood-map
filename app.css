@@ -140,7 +140,10 @@ li {
   padding: 0 1rem; }
 
 li:hover {
-  background-color: #f9c156; }
+  background-color: #f9d48e; }
+
+li:hover > a > div.place-name {
+  color: #000000; }
 
 .map {
   float: right;
