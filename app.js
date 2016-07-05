@@ -354,8 +354,11 @@ function toggleMenu() {
     mapDiv.toggleClass('map-close');
     menu.toggleClass('menu-close');
     setTimeout(function () {
+        var content = infoWindow.getContent();
+        console.log("content: ", content);
         google.maps.event.trigger(map, 'resize');
         map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+        infoWindow.setContent(content);
         console.log("recentering...");
     }, 500);
 }

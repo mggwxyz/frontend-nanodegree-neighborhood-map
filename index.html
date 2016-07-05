@@ -5,6 +5,7 @@
         <meta name="viewport" content="initial-scale=1.0">
         <meta charset="utf-8">
         <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
         <link href="app.css" rel="stylesheet">
     </head>
     <body>
@@ -19,17 +20,17 @@
                 </header>
                 <section id="input-pane">
                     <div class="input-container">
-                        <label for="search">Search </label><input id="search" name="search" type="text" placeholder="Ex. restaurant, art, library, etc." data-bind="textInput: search">
+                        <label for="search">Search </label><input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="textInput: search">
                     </div>
                     <div class="input-container">
-                        <label for="filter">Filter </label><input id="filter" for="filter" type="text" placeholder="Enter text to filter out places..."/ data-bind="textInput: filter">
+                        <label for="filter">Filter </label><input id="filter" for="filter" type="text" placeholder="Type here to filter out places..."/ data-bind="textInput: filter">
                     </div>
                 </section>
                 <section id="places-pane">
                     <ul data-bind="foreach: { data: places , as: 'place'}">
                         <li data-bind="if: place.show">
                             <a data-bind="click: $parent.getYelpInfo" href="">
-                                <div class="bullet">&#9702;</div><div class="place-name" data-bind="text: place.name"></div>
+                                <div class="place-name" data-bind="text: place.name"></div>
                             </a>
                         </li>
                     </ul>
