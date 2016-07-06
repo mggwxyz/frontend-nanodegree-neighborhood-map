@@ -99,14 +99,13 @@ var defaultPlaces = [{
 
 //KO Simple View Model
 var viewModel = {
-    search: ko.observable(""),
+    search: ko.observable("art gallery"),
     filter: ko.observable(""),
     status: ko.observable(""),
     places: ko.observableArray([]),
     getYelpInfo: function(place){
         //check to see if screen is small and menu is open
         if(window.innerWidth < 500 && !$('#menu').hasClass("menu-close")){
-            console.log("Closing menu");
             toggleMenu();
         }
         yelpHelper.getYelpPlace(place.id, place.marker);
@@ -118,10 +117,17 @@ viewModel.filter.subscribe(function(newValue) {
     filterPlaces(newValue);
 });
 
-//KO Subscription that watches the filter observable and filters places from list
+//KO Subscription that watches the search observable and searches places for from list
 viewModel.search.subscribe(function(newValue) {
-    yelpHelper.getYelpPlaces(newValue);
+    if (newValue.trim() !== "") {
+        searchPlaces(newValue.trim());
+    }S
 });
+
+//Function that takes the search parameter and queries yelp for places to populate the list view
+function searchPlaces(value){
+    yelpHelper.getYelpPlaces(value);
+}
 
 //Function that removes places from list and map base on filter entered
 function filterPlaces(value) {
@@ -142,7 +148,6 @@ ko.applyBindings(viewModel);
 
 //Init Map function
 var initMap = function() {
-    console.log("Starting initMap()...")
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
     function geoSuccess(position) {
@@ -178,24 +183,17 @@ var initMap = function() {
     };
 
     function finishInit() {
-        console.log("finishInit called...");
-
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
-        placeMarkers();
+        defaultPlaces.forEach(function(place){
+            addMarker(place);
+        });
     };
 
 
 }
 
-function placeMarkers(){
-    defaultPlaces.forEach(function(place){
-        addMarker(place);
-    });
-};
-
 function addMarker(place) {
-    console.log("creating marker for " + place.id);
     var marker = new google.maps.Marker({
         map: map,
         position: {
@@ -205,14 +203,12 @@ function addMarker(place) {
         icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
     });
 
-    console.log("about to add listener for " + place.id);
     marker.addListener('click', openMarker);
     place.marker = marker;
     place.show = ko.observable(true);
     viewModel.places.push(place);
 
     function openMarker() {
-        console.log("click function called");
         map.setCenter(marker.getPosition());
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
@@ -257,8 +253,6 @@ function YelpHelper(){
             cache: true,
             dataType: 'jsonp',
             success: function(result) {
-                console.log("Success: " + result);
-                console.log(result);
                 var node = document.createElement('DIV');
                 node.innerHTML = "<div class='place-container'><div class='place-image'>"
                     + "<img src='" + result.image_url + "'/>"
@@ -317,14 +311,11 @@ function YelpHelper(){
             cache: true,
             dataType: 'jsonp',
             success: function(result) {
-                console.log("Success: " + result);
-                console.log(result);
                 var places = viewModel.places();
                 var length = places.length;
                 for(var i = 0; i < length; i++ ){
                     var removedPlace = places.shift();
                     removedPlace.marker.setMap(null);
-                    console.log("Removed marker for ", removedPlace.name);
                 }
                 viewModel.places.removeAll();
                 result.businesses.forEach(function(place){
@@ -347,26 +338,17 @@ function YelpHelper(){
 
 }
 
-
+// Toggles the menu sidebar to open or close
 function toggleMenu() {
     var mapDiv = $("#map");
     var menu = $("#menu");
     mapDiv.toggleClass('map-close');
     menu.toggleClass('menu-close');
+    //Resize map and pan back to center
     setTimeout(function () {
         var content = infoWindow.getContent();
-        console.log("content: ", content);
         google.maps.event.trigger(map, 'resize');
         map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
         infoWindow.setContent(content);
-        console.log("recentering...");
     }, 500);
 }
-
-// window.onerror = function(errorMsg, url, lineNumber) {
-//     document.body.innerHTML = '<div class="errorPage"><div class="errorMessage">'
-//     + 'Uh oh! Something went wrong. Try refreshing the page.<br>'
-//     + errorMsg
-//     + '</div></div>';
-//     return true;
-// }
