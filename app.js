@@ -303,7 +303,7 @@ function YelpHelper(){
             oauth_signature_method: 'HMAC-SHA1',
             oauth_version: '1.0',
             callback: 'cb',
-            limit: 20,
+            limit: 10,
             term: term,
             ll: center.lat() + ',' + center.lng()
         };
