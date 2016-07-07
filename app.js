@@ -121,7 +121,9 @@ viewModel.filter.subscribe(function(newValue) {
 viewModel.search.subscribe(function(newValue) {
     if (newValue.trim() !== "") {
         searchPlaces(newValue.trim());
-    }S
+    } else {
+        clearYelpPlaces();
+    }
 });
 
 //Function that takes the search parameter and queries yelp for places to populate the list view
@@ -160,7 +162,9 @@ var initMap = function() {
             zoom: 12,
             mapTypeControl: false
         });
-        finishInit();
+        infoWindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map);
+        yelpHelper.getYelpPlaces(viewModel.search());
     };
 
     function geoError(error) {
@@ -179,18 +183,12 @@ var initMap = function() {
                 longitude: LNG
             }
         };
-        finishInit();
-    };
-
-    function finishInit() {
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
         defaultPlaces.forEach(function(place){
             addMarker(place);
         });
     };
-
-
 }
 
 function addMarker(place) {
@@ -218,6 +216,22 @@ function addMarker(place) {
     }
 }
 
+// Toggles the menu sidebar to open or close
+function toggleMenu() {
+    var mapDiv = $("#map");
+    var menu = $("#menu");
+    mapDiv.toggleClass('map-close');
+    menu.toggleClass('menu-close');
+    //Resize map and pan back to center
+    setTimeout(function () {
+        var content = infoWindow.getContent();
+        google.maps.event.trigger(map, 'resize');
+        map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+        infoWindow.setContent(content);
+    }, 500);
+}
+
+// Function to hold all yelp api relatated functions
 function YelpHelper(){
 
     var xhr;
@@ -230,10 +244,9 @@ function YelpHelper(){
         return (Math.floor(Math.random() * 1e12).toString());
     }
 
+    //
     function getYelpPlace(placeId, marker) {
-
         var yelp_url = 'https://api.yelp.com/v2/business/' + placeId;
-
         var parameters = {
             oauth_consumer_key: YELP_KEY,
             oauth_token: YELP_TOKEN,
@@ -243,10 +256,8 @@ function YelpHelper(){
             oauth_version: '1.0',
             callback: 'cb',
         };
-
         var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
         parameters.oauth_signature = encodedSignature;
-
         var settings = {
             url: yelp_url,
             data: parameters,
@@ -270,11 +281,9 @@ function YelpHelper(){
 
             }
         };
-
         infoWindow.open(map, marker);
         infoWindow.setContent("Loading Yelp Data...");
         map.panTo(marker.getPosition());
-
         // Send AJAX query via jQuery library.
         $.ajax(settings);
     }
@@ -311,13 +320,7 @@ function YelpHelper(){
             cache: true,
             dataType: 'jsonp',
             success: function(result) {
-                var places = viewModel.places();
-                var length = places.length;
-                for(var i = 0; i < length; i++ ){
-                    var removedPlace = places.shift();
-                    removedPlace.marker.setMap(null);
-                }
-                viewModel.places.removeAll();
+                clearYelpPlaces();
                 result.businesses.forEach(function(place){
                     addMarker(place);
                 });
@@ -331,24 +334,21 @@ function YelpHelper(){
         xhr = $.ajax(settings);
     }
 
+    // Clear out places from list view
+    function clearYelpPlaces(){
+        var places = viewModel.places();
+        var length = places.length;
+        for(var i = 0; i < length; i++ ){
+            var removedPlace = places.shift();
+            removedPlace.marker.setMap(null);
+        }
+        viewModel.places.removeAll();
+    }
+
     return {
         getYelpPlace : getYelpPlace,
-        getYelpPlaces : getYelpPlaces
+        getYelpPlaces : getYelpPlaces,
+        clearYelpPlaces : clearYelpPlaces
     };
 
-}
-
-// Toggles the menu sidebar to open or close
-function toggleMenu() {
-    var mapDiv = $("#map");
-    var menu = $("#menu");
-    mapDiv.toggleClass('map-close');
-    menu.toggleClass('menu-close');
-    //Resize map and pan back to center
-    setTimeout(function () {
-        var content = infoWindow.getContent();
-        google.maps.event.trigger(map, 'resize');
-        map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
-        infoWindow.setContent(content);
-    }, 500);
 }
