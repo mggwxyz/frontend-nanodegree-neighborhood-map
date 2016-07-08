@@ -165,7 +165,7 @@ var initMap = function() {
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
         yelpHelper.getYelpPlaces(viewModel.search());
-    };
+    }
 
     function geoError(error) {
         console.log("Geolocation Error: " + error.code);
@@ -188,8 +188,8 @@ var initMap = function() {
         defaultPlaces.forEach(function(place){
             addMarker(place);
         });
-    };
-}
+    }
+};
 
 function addMarker(place) {
     var marker = new google.maps.Marker({
