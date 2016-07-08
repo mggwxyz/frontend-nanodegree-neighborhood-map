@@ -20,10 +20,10 @@
                 </header>
                 <section id="input-pane">
                     <div class="input-container">
-                        <label for="search">Search </label><input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="textInput: search">
+                        <label for="search">Search </label><input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="value: searchText, valueUpdate: 'keyup'">
                     </div>
                     <div class="input-container">
-                        <label for="filter">Filter </label><input id="filter" name="filter" type="text" placeholder="Type here to filter out places..."/ data-bind="textInput: filter">
+                        <label for="filter">Filter </label><input id="filter" name="filter" type="text" placeholder="Type here to filter out places..."/ data-bind="value: filterText, valueUpdate: 'keyup'">
                     </div>
                 </section>
                 <section id="places-pane">

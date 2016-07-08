@@ -102,41 +102,51 @@ var defaultPlaces = [{
 //KO Simple View Model
 var ViewModel = function(searchText){
     var self = this;
-    this.searchText = ko.observable(searchText);
+    self.searchText = ko.observable(searchText);
     //KO Subscription that watches the search observable and searches places for from list
-    this.search.subscribe(function(newValue) {
-        if (newValue.trim() !== '') {
-            searchPlaces(newValue.trim());
+    self.search = ko.computed(function() {
+        if (self.searchText().trim() !== '') {
+            searchPlaces(self.searchText().trim());
         } else {
             clearYelpPlaces();
         }
     });
-    this.filter = ko.observable('');
-    //KO Subscription that watches the filter observable and filters places from list
-    this.filter.subscribe(function(newValue) {
-        filterPlaces(newValue);
-    });
-    this.status = ko.observable('');
-    this.places = ko.observableArray([]);
-    this.addPlace = function(place){
+    self.filterText = ko.observable('');
+    //Function that removes places from list and map base on filter entered
+    self.filter = function(){
+        var regex = new RegExp(self.filterText, 'i');
+        self.places.forEach(function(place) {
+            if (place.name.search(regex) == -1) {
+                place.show(false);
+                place.marker.setVisible(false);
+            } else {
+                place.show(true);
+                place.marker.setVisible(true);
+            }
+        });
+    };
+    self.places = ko.observableArray([]);
+    self.addPlace = function(place){
         self.places.push(place);
     };
-    this.searchPlaces = function(){
+    self.searchPlaces = function(){
 
     };
-    this.filterPlaces = function(){
+    self.filterPlaces = function(){
 
     };
-    this.clearPlaces = function(){
+    self.clearPlaces = function(){
 
     };
-    this.getYelpInfo = function(place){
+    self.getYelpInfo = function(place){
         //check to see if screen is small and menu is open
         if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
             toggleMenu();
         }
         yelpHelper.getYelpPlace(place.id, place.marker);
     };
+
+
 };
 
 //Function that takes the search parameter and queries yelp for places to populate the list view
@@ -144,22 +154,10 @@ function searchPlaces(value){
     yelpHelper.getYelpPlaces(value);
 }
 
-//Function that removes places from list and map base on filter entered
-function filterPlaces(value) {
-    var regex = new RegExp(value, 'i');
-    ViewModel.places().forEach(function(place) {
-        if (place.name.search(regex) == -1) {
-            place.show(false);
-            place.marker.setVisible(false);
-        } else {
-            place.show(true);
-            place.marker.setVisible(true);
-        }
-    });
-}
-
 //Init Map function
 var initMap = function() {
+
+
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
     function geoSuccess(position) {
@@ -174,6 +172,8 @@ var initMap = function() {
         });
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
+        //Applying the bindings to the view model
+        ko.applyBindings(new ViewModel('art gallery'));
         yelpHelper.getYelpPlaces(ViewModel.search());
     }
 
@@ -195,6 +195,8 @@ var initMap = function() {
         };
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
+        //Applying the bindings to the view model
+        ko.applyBindings(new ViewModel('art gallery'));
         defaultPlaces.forEach(function(place){
             addMarker(place);
         });
@@ -362,6 +364,3 @@ function YelpHelper(){
     };
 
 }
-
-//Applying the bindings to the view model
-ko.applyBindings(new ViewModel('art gallery'));
