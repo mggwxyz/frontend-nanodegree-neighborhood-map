@@ -100,33 +100,44 @@ var defaultPlaces = [{
 }];
 
 //KO Simple View Model
-var viewModel = {
-    search: ko.observable('art gallery'),
-    filter: ko.observable(''),
-    status: ko.observable(''),
-    places: ko.observableArray([]),
-    getYelpInfo: function(place){
+var ViewModel = function(searchText){
+    var self = this;
+    this.searchText = ko.observable(searchText);
+    //KO Subscription that watches the search observable and searches places for from list
+    this.search.subscribe(function(newValue) {
+        if (newValue.trim() !== '') {
+            searchPlaces(newValue.trim());
+        } else {
+            clearYelpPlaces();
+        }
+    });
+    this.filter = ko.observable('');
+    //KO Subscription that watches the filter observable and filters places from list
+    this.filter.subscribe(function(newValue) {
+        filterPlaces(newValue);
+    });
+    this.status = ko.observable('');
+    this.places = ko.observableArray([]);
+    this.addPlace = function(place){
+        self.places.push(place);
+    };
+    this.searchPlaces = function(){
+
+    };
+    this.filterPlaces = function(){
+
+    };
+    this.clearPlaces = function(){
+
+    };
+    this.getYelpInfo = function(place){
         //check to see if screen is small and menu is open
         if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
             toggleMenu();
         }
         yelpHelper.getYelpPlace(place.id, place.marker);
-    }
+    };
 };
-
-//KO Subscription that watches the filter observable and filters places from list
-viewModel.filter.subscribe(function(newValue) {
-    filterPlaces(newValue);
-});
-
-//KO Subscription that watches the search observable and searches places for from list
-viewModel.search.subscribe(function(newValue) {
-    if (newValue.trim() !== '') {
-        searchPlaces(newValue.trim());
-    } else {
-        clearYelpPlaces();
-    }
-});
 
 //Function that takes the search parameter and queries yelp for places to populate the list view
 function searchPlaces(value){
@@ -136,7 +147,7 @@ function searchPlaces(value){
 //Function that removes places from list and map base on filter entered
 function filterPlaces(value) {
     var regex = new RegExp(value, 'i');
-    viewModel.places().forEach(function(place) {
+    ViewModel.places().forEach(function(place) {
         if (place.name.search(regex) == -1) {
             place.show(false);
             place.marker.setVisible(false);
@@ -146,9 +157,6 @@ function filterPlaces(value) {
         }
     });
 }
-
-//Applying the bindings to the view model
-ko.applyBindings(viewModel);
 
 //Init Map function
 var initMap = function() {
@@ -166,7 +174,7 @@ var initMap = function() {
         });
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
-        yelpHelper.getYelpPlaces(viewModel.search());
+        yelpHelper.getYelpPlaces(ViewModel.search());
     }
 
     function geoError(error) {
@@ -206,7 +214,7 @@ function addMarker(place) {
     marker.addListener('click', openMarker);
     place.marker = marker;
     place.show = ko.observable(true);
-    viewModel.places.push(place);
+    ViewModel.addPlace(place);
 
     function openMarker() {
         map.setCenter(marker.getPosition());
@@ -267,13 +275,13 @@ function YelpHelper(){
             dataType: 'jsonp',
             success: function(result) {
                 var node = document.createElement('DIV');
-                node.innerHTML = '<div class='place-container'><div class='place-image'>'
-                    + '<img src='' + result.image_url + ''/>'
-                    + '</div><div class='place-info'>'
+                node.innerHTML = '<div class="place-container"><div class="place-image">'
+                    + '<img src="' + result.image_url + '"/>'
+                    + '</div><div class="place-info">'
                     + '<p><strong>Name:</strong> ' + result.name + '</p>'
                     + '<p><strong>Phone:</strong> ' + result.display_phone + '</p>'
                     + '<p><strong>Rating:</strong> ' + result.rating + '</p>'
-                    + '<p><a href='' + result.url + ''>Find Out More</a></p>'
+                    + '<p><a href="' + result.url + '">Find Out More</a></p>'
                     + '</div></div>';
                 infoWindow.setContent(node);
             },
@@ -338,13 +346,13 @@ function YelpHelper(){
 
     // Clear out places from list view
     function clearYelpPlaces(){
-        var places = viewModel.places();
+        var places = ViewModel.places();
         var length = places.length;
         for(var i = 0; i < length; i++ ){
             var removedPlace = places.shift();
             removedPlace.marker.setMap(null);
         }
-        viewModel.places.removeAll();
+        ViewModel.places.removeAll();
     }
 
     return {
@@ -354,3 +362,6 @@ function YelpHelper(){
     };
 
 }
+
+//Applying the bindings to the view model
+ko.applyBindings(new ViewModel('art gallery'));
