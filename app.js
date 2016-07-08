@@ -101,17 +101,22 @@ var defaultPlaces = [{
 
 //KO Simple View Model
 var ViewModel = function(searchText){
+
     var self = this;
+
     self.searchText = ko.observable(searchText);
-    //KO Subscription that watches the search observable and searches places for from list
+    self.filterText = ko.observable('');
+    self.places = ko.observableArray([]);
+
+    //KO Subscription that watches the search observable and searches places for list
     self.search = ko.computed(function() {
         if (self.searchText().trim() !== '') {
-            searchPlaces(self.searchText().trim());
+            yelpHelper.getYelpPlaces(self.searchText().trim());
         } else {
-            clearYelpPlaces();
+            self.clearPlaces();
         }
     });
-    self.filterText = ko.observable('');
+
     //Function that removes places from list and map base on filter entered
     self.filter = function(){
         var regex = new RegExp(self.filterText, 'i');
@@ -125,19 +130,47 @@ var ViewModel = function(searchText){
             }
         });
     };
-    self.places = ko.observableArray([]);
-    self.addPlace = function(place){
-        self.places.push(place);
-    };
-    self.searchPlaces = function(){
 
-    };
-    self.filterPlaces = function(){
+    self.addPlace = ko.computed({
+        read: function(){
+            return "";
+        },
+        write: function(place) {
+            // var marker = new google.maps.Marker({
+            //     map: map,
+            //     position: {
+            //         lng: place.location.coordinate.longitude,
+            //         lat: place.location.coordinate.latitude
+            //     },
+            //     icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            // });
+            //
+            // marker.addListener('click', openMarker);
+            // place.marker = marker;
+            // place.show = ko.observable(true);
+            // self.places.push(place);
+            //
+            // function openMarker() {
+            //     map.setCenter(marker.getPosition());
+            //     marker.setAnimation(google.maps.Animation.BOUNCE);
+            //     setTimeout(function() {
+            //         marker.setAnimation(null);
+            //     }, 700);
+            //     yelpHelper.getYelpPlace(place.id, marker);
+            // }
+        }
+    });
 
-    };
-    self.clearPlaces = function(){
+    // Clear out places from list view
+    self.clearPlaces = ko.computed(function(){
+        var length = self.places().length;
+        for(var i = 0; i < length; i++ ){
+            var removedPlace = self.places().shift();
+            removedPlace.marker.setMap(null);
+        }
+        self.places().removeAll();
+    });
 
-    };
     self.getYelpInfo = function(place){
         //check to see if screen is small and menu is open
         if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
@@ -149,14 +182,8 @@ var ViewModel = function(searchText){
 
 };
 
-//Function that takes the search parameter and queries yelp for places to populate the list view
-function searchPlaces(value){
-    yelpHelper.getYelpPlaces(value);
-}
-
 //Init Map function
 var initMap = function() {
-
 
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
@@ -171,7 +198,6 @@ var initMap = function() {
             mapTypeControl: false
         });
         infoWindow = new google.maps.InfoWindow();
-        service = new google.maps.places.PlacesService(map);
         //Applying the bindings to the view model
         ko.applyBindings(new ViewModel('art gallery'));
         yelpHelper.getYelpPlaces(ViewModel.search());
@@ -194,39 +220,15 @@ var initMap = function() {
             }
         };
         infoWindow = new google.maps.InfoWindow();
-        service = new google.maps.places.PlacesService(map);
         //Applying the bindings to the view model
         ko.applyBindings(new ViewModel('art gallery'));
         defaultPlaces.forEach(function(place){
-            addMarker(place);
+            ViewModel.addPlace(place);
         });
     }
 };
 
-function addMarker(place) {
-    var marker = new google.maps.Marker({
-        map: map,
-        position: {
-            lng: place.location.coordinate.longitude,
-            lat: place.location.coordinate.latitude
-        },
-        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-    });
 
-    marker.addListener('click', openMarker);
-    place.marker = marker;
-    place.show = ko.observable(true);
-    ViewModel.addPlace(place);
-
-    function openMarker() {
-        map.setCenter(marker.getPosition());
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(function() {
-            marker.setAnimation(null);
-        }, 700);
-        yelpHelper.getYelpPlace(place.id, marker);
-    }
-}
 
 // Toggles the menu sidebar to open or close
 function toggleMenu() {
@@ -332,7 +334,7 @@ function YelpHelper(){
             cache: true,
             dataType: 'jsonp',
             success: function(result) {
-                clearYelpPlaces();
+                ViewModel.clearPlaces();
                 result.businesses.forEach(function(place){
                     addMarker(place);
                 });
@@ -346,21 +348,11 @@ function YelpHelper(){
         xhr = $.ajax(settings);
     }
 
-    // Clear out places from list view
-    function clearYelpPlaces(){
-        var places = ViewModel.places();
-        var length = places.length;
-        for(var i = 0; i < length; i++ ){
-            var removedPlace = places.shift();
-            removedPlace.marker.setMap(null);
-        }
-        ViewModel.places.removeAll();
-    }
+
 
     return {
         getYelpPlace : getYelpPlace,
-        getYelpPlaces : getYelpPlaces,
-        clearYelpPlaces : clearYelpPlaces
+        getYelpPlaces : getYelpPlaces
     };
 
 }
