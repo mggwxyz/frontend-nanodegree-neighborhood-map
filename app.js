@@ -1,3 +1,5 @@
+'use strict'
+
 //Global variables
 var map, userPosition, infoWindow, service, yelpHelper;
 var LAT = 38.9072;
@@ -6,106 +8,106 @@ var yelpHelper = new YelpHelper();
 
 //Hard-Coded Destinations
 var defaultPlaces = [{
-    "id": "national-gallery-of-art-washington",
-    "name": "National Gallery of Art",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.8913416579172,
-            "longitude": -77.0198351875512
+    'id': 'national-gallery-of-art-washington',
+    'name': 'National Gallery of Art',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.8913416579172,
+            'longitude': -77.0198351875512
         }
     }
 }, {
-    "id": "hirshhorn-museum-and-sculpture-garden-washington-2",
-    "name": "Hirshhorn Museum & Sculpture Garden",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.8875699,
-            "longitude": -77.02191
+    'id': 'hirshhorn-museum-and-sculpture-garden-washington-2',
+    'name': 'Hirshhorn Museum & Sculpture Garden',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.8875699,
+            'longitude': -77.02191
         }
     }
 }, {
-    "id": "bloombars-washington",
-    "name": "BloomBars",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.930202,
-            "longitude": -77.028114
+    'id': 'bloombars-washington',
+    'name': 'BloomBars',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.930202,
+            'longitude': -77.028114
         }
     }
 }, {
-    "id": "freer-gallery-of-art-and-arthur-m-sackler-gallery-washington",
-    "name": "Freer Gallery of Art and Arthur M Sackler Gallery",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.8875252753496,
-            "longitude": -77.0265506207943
+    'id': 'freer-gallery-of-art-and-arthur-m-sackler-gallery-washington',
+    'name': 'Freer Gallery of Art and Arthur M Sackler Gallery',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.8875252753496,
+            'longitude': -77.0265506207943
         }
     }
 }, {
-    "id": "the-fridge-washington",
-    "name": "The Fridge",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.88213,
-            "longitude": -76.994232
+    'id': 'the-fridge-washington',
+    'name': 'The Fridge',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.88213,
+            'longitude': -76.994232
         }
     }
 }, {
-    "id": "national-gallery-of-art-sculpture-garden-washington-2",
-    "name": "National Gallery of Art Sculpture Garden",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.8912975692515,
-            "longitude": -77.022959356414
+    'id': 'national-gallery-of-art-sculpture-garden-washington-2',
+    'name': 'National Gallery of Art Sculpture Garden',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.8912975692515,
+            'longitude': -77.022959356414
         }
     }
 }, {
-    "id": "toro-mata-washington",
-    "name": "Toro Mata",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.92099,
-            "longitude": -77.04238
+    'id': 'toro-mata-washington',
+    'name': 'Toro Mata',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.92099,
+            'longitude': -77.04238
         }
     }
 }, {
-    "id": "the-smithsonian-institution-washington",
-    "name": "The Smithsonian Institution",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.8889236,
-            "longitude": -77.0261612
+    'id': 'the-smithsonian-institution-washington',
+    'name': 'The Smithsonian Institution',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.8889236,
+            'longitude': -77.0261612
         }
     }
 }, {
-    "id": "artists-proof-washington-2",
-    "name": "Artist's Proof",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.910091,
-            "longitude": -77.064407
+    'id': 'artists-proof-washington-2',
+    'name': 'Artist\'s Proof',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.910091,
+            'longitude': -77.064407
         }
     }
 }, {
-    "id": "the-phillips-collection-washington-3",
-    "name": "The Phillips Collection",
-    "location": {
-        "coordinate" : {
-            "latitude": 38.911477119043,
-            "longitude": -77.0468060633715
+    'id': 'the-phillips-collection-washington-3',
+    'name': 'The Phillips Collection',
+    'location': {
+        'coordinate' : {
+            'latitude': 38.911477119043,
+            'longitude': -77.0468060633715
         }
     }
 }];
 
 //KO Simple View Model
 var viewModel = {
-    search: ko.observable("art gallery"),
-    filter: ko.observable(""),
-    status: ko.observable(""),
+    search: ko.observable('art gallery'),
+    filter: ko.observable(''),
+    status: ko.observable(''),
     places: ko.observableArray([]),
     getYelpInfo: function(place){
         //check to see if screen is small and menu is open
-        if(window.innerWidth < 500 && !$('#menu').hasClass("menu-close")){
+        if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
             toggleMenu();
         }
         yelpHelper.getYelpPlace(place.id, place.marker);
@@ -119,7 +121,7 @@ viewModel.filter.subscribe(function(newValue) {
 
 //KO Subscription that watches the search observable and searches places for from list
 viewModel.search.subscribe(function(newValue) {
-    if (newValue.trim() !== "") {
+    if (newValue.trim() !== '') {
         searchPlaces(newValue.trim());
     } else {
         clearYelpPlaces();
@@ -133,7 +135,7 @@ function searchPlaces(value){
 
 //Function that removes places from list and map base on filter entered
 function filterPlaces(value) {
-    var regex = new RegExp(value, "i");
+    var regex = new RegExp(value, 'i');
     viewModel.places().forEach(function(place) {
         if (place.name.search(regex) == -1) {
             place.show(false);
@@ -168,7 +170,7 @@ var initMap = function() {
     }
 
     function geoError(error) {
-        console.log("Geolocation Error: " + error.code);
+        console.log('Geolocation Error: ' + error.code);
         map = new google.maps.Map(document.getElementById('map'), {
             center: {
                 lat: LAT,
@@ -218,8 +220,8 @@ function addMarker(place) {
 
 // Toggles the menu sidebar to open or close
 function toggleMenu() {
-    var mapDiv = $("#map");
-    var menu = $("#menu");
+    var mapDiv = $('#map');
+    var menu = $('#menu');
     mapDiv.toggleClass('map-close');
     menu.toggleClass('menu-close');
     //Resize map and pan back to center
@@ -235,10 +237,10 @@ function toggleMenu() {
 function YelpHelper(){
 
     var xhr;
-    var YELP_KEY = "pV7R7vzUXJEFfl3Dj4retQ",
-        YELP_TOKEN = "VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL",
-        YELP_KEY_SECRET = "t4CQ3YyzkgP26-lDGp1pVoLOFks",
-        YELP_TOKEN_SECRET = "SB5H01fW3LCNi3qyO7uaJ59DK9U";
+    var YELP_KEY = 'pV7R7vzUXJEFfl3Dj4retQ',
+        YELP_TOKEN = 'VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL',
+        YELP_KEY_SECRET = 't4CQ3YyzkgP26-lDGp1pVoLOFks',
+        YELP_TOKEN_SECRET = 'SB5H01fW3LCNi3qyO7uaJ59DK9U';
 
     function nonce_generate() {
         return (Math.floor(Math.random() * 1e12).toString());
@@ -265,24 +267,24 @@ function YelpHelper(){
             dataType: 'jsonp',
             success: function(result) {
                 var node = document.createElement('DIV');
-                node.innerHTML = "<div class='place-container'><div class='place-image'>"
-                    + "<img src='" + result.image_url + "'/>"
-                    + "</div><div class='place-info'>"
-                    + "<p><strong>Name:</strong> " + result.name + "</p>"
-                    + "<p><strong>Phone:</strong> " + result.display_phone + "</p>"
-                    + "<p><strong>Rating:</strong> " + result.rating + "</p>"
-                    + "<p><a href='" + result.url + "'>Find Out More</a></p>"
-                    + "</div></div>";
+                node.innerHTML = '<div class='place-container'><div class='place-image'>'
+                    + '<img src='' + result.image_url + ''/>'
+                    + '</div><div class='place-info'>'
+                    + '<p><strong>Name:</strong> ' + result.name + '</p>'
+                    + '<p><strong>Phone:</strong> ' + result.display_phone + '</p>'
+                    + '<p><strong>Rating:</strong> ' + result.rating + '</p>'
+                    + '<p><a href='' + result.url + ''>Find Out More</a></p>'
+                    + '</div></div>';
                 infoWindow.setContent(node);
             },
             error: function(result) {
-                console.log("Error: " + result);
-                infoWindow.setContent("Error loading data.");
+                console.log('Error: ' + result);
+                infoWindow.setContent('Error loading data.');
 
             }
         };
         infoWindow.open(map, marker);
-        infoWindow.setContent("Loading Yelp Data...");
+        infoWindow.setContent('Loading Yelp Data...');
         map.panTo(marker.getPosition());
         // Send AJAX query via jQuery library.
         $.ajax(settings);
@@ -326,7 +328,7 @@ function YelpHelper(){
                 });
             },
             error: function(result) {
-                console.log("Error: " + result);
+                console.log('Error: ' + result);
             }
         };
 
