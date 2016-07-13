@@ -1,10 +1,17 @@
-'use strict'
+'use strict';
 
 //Global variables
 var map, userPosition, infoWindow, service, yelpHelper;
 var LAT = 38.9072;
 var LNG = -77.0369;
 var yelpHelper = new YelpHelper();
+var ko = ko;
+var console = console;
+var google = google;
+var window = window;
+var document = document;
+var $ = $;
+var setTimeout = setTimeout;
 
 //Hard-Coded Destinations
 var defaultPlaces = [{
@@ -182,8 +189,11 @@ var ViewModel = function(searchText){
 
 };
 
-//Init Map function
+//Init Map Callback once Google Maps API is downloadeed
 var initMap = function() {
+
+    var google = google;
+    var navigator = navigator;
 
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
@@ -248,7 +258,9 @@ function toggleMenu() {
 // Function to hold all yelp api relatated functions
 function YelpHelper(){
 
+    //Local Variables Need for API Calls
     var xhr;
+    var oauthSignature = oauthSignature;
     var YELP_KEY = 'pV7R7vzUXJEFfl3Dj4retQ',
         YELP_TOKEN = 'VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL',
         YELP_KEY_SECRET = 't4CQ3YyzkgP26-lDGp1pVoLOFks',
@@ -258,7 +270,6 @@ function YelpHelper(){
         return (Math.floor(Math.random() * 1e12).toString());
     }
 
-    //
     function getYelpPlace(placeId, marker) {
         var yelp_url = 'https://api.yelp.com/v2/business/' + placeId;
         var parameters = {
@@ -279,14 +290,14 @@ function YelpHelper(){
             dataType: 'jsonp',
             success: function(result) {
                 var node = document.createElement('DIV');
-                node.innerHTML = '<div class="place-container"><div class="place-image">'
-                    + '<img src="' + result.image_url + '"/>'
-                    + '</div><div class="place-info">'
-                    + '<p><strong>Name:</strong> ' + result.name + '</p>'
-                    + '<p><strong>Phone:</strong> ' + result.display_phone + '</p>'
-                    + '<p><strong>Rating:</strong> ' + result.rating + '</p>'
-                    + '<p><a href="' + result.url + '">Find Out More</a></p>'
-                    + '</div></div>';
+                node.innerHTML = '<div class="place-container"><div class="place-image">' +
+                    '<img src="' + result.image_url + '"/>' +
+                    '</div><div class="place-info">' +
+                    '<p><strong>Name:</strong> ' + result.name + '</p>' +
+                    '<p><strong>Phone:</strong> ' + result.display_phone + '</p>' +
+                    '<p><strong>Rating:</strong> ' + result.rating + '</p>' +
+                    '<p><a href="' + result.url + '">Find Out More</a></p>' +
+                    '</div></div>';
                 infoWindow.setContent(node);
             },
             error: function(result) {
@@ -301,6 +312,7 @@ function YelpHelper(){
         // Send AJAX query via jQuery library.
         $.ajax(settings);
     }
+
 
     function getYelpPlaces(term) {
 
@@ -336,7 +348,7 @@ function YelpHelper(){
             success: function(result) {
                 ViewModel.clearPlaces();
                 result.businesses.forEach(function(place){
-                    addMarker(place);
+                    ViewModel.addPlacd(place);
                 });
             },
             error: function(result) {
@@ -348,11 +360,13 @@ function YelpHelper(){
         xhr = $.ajax(settings);
     }
 
-
-
     return {
         getYelpPlace : getYelpPlace,
         getYelpPlaces : getYelpPlaces
     };
 
 }
+
+var handleError = function(){
+
+};
