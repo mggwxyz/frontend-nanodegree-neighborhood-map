@@ -1,12 +1,12 @@
 /*jslint browser: true */
 /*global window: false */
 
-//Global variables
-var google, map, userPosition, infoWindow, yelpHelper;
-var LAT = 38.9072,
+// Global variables
+var google, map, userPosition, infoWindow, yelpHelper,
+    LAT = 38.9072,
     LNG = -77.0369;
 
-//Hard-Coded Destinations
+// Hard-Coded Destinations
 var defaultPlaces = [{
     id: 'national-gallery-of-art-washington',
     name: 'National Gallery of Art',
@@ -99,21 +99,26 @@ var defaultPlaces = [{
     }
 }];
 
-//KO Simple View Model
+// Knockout ViewModel
 function ViewModel(searchText, useDefaultPlaces ) {
     'use strict';
 
-    var self = this;
-    var yelpHelper = new YelpHelper();
-    var initialized = false;
-    var dflt = useDefaultPlaces;
-    self.searchText = ko.observable(searchText);
-    self.filterText = ko.observable('');
-    self.places = ko.observableArray([]);
+    //Initialize local variables for ViewModel
+    var self = this; // Variable self refers to ViewModel to clear up 'this' confusion
+    var yelpHelper = new YelpHelper(); // Object is used for ajax calls to Yelp API
+    var initialized = false; // Variable to tell if the map has initialized or not
+    var dflt = useDefaultPlaces; // Variable indicating whether to use default places
 
-    //KO Subscription that watches the search observable and searches places for list
+    // Initialize Knockout observables
+    self.searchText = ko.observable(searchText); // Observable for search input text
+    self.filterText = ko.observable(''); // Observable for filter input text
+    self.places = ko.observableArray([]); // Obserable Array for all places in list
+
+    // KO computed observable that watches changes to the search observable and qeuries yelp for relevant places
     self.search = ko.computed(function() {
+        // Only search if search text is not empty
         if (self.searchText().trim() !== '') {
+            // Only
             if(self.searchText().trim() === 'art gallery' && dflt && !initialized ){
                 var i;
                 for(i = 0; i < defaultPlaces.length ; i++){
@@ -123,12 +128,16 @@ function ViewModel(searchText, useDefaultPlaces ) {
             } else {
                 yelpHelper.getYelpPlaces(self.searchText().trim());
             }
+        // Otherwise clear out the list if there is no search text
         } else {
             self.clearPlaces();
         }
     });
 
-    //Function that removes places from list and map base on filter entered
+    /*
+     * KO computed observable that watches changes to the filter observable then
+     * removes places from list and map base on filter entered
+     */
     self.filter = ko.computed(function(){
         var regex = new RegExp(self.filterText(), 'i');
         self.places().forEach(function(place) {
@@ -142,6 +151,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
         });
     });
 
+    // Function that will add place and marker to the places observable array
     function addPlace(place){
         var marker = new google.maps.Marker({
             map: map,
@@ -158,6 +168,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
         self.places.push(place);
     }
 
+    // Function that opens animates and opens a Google Maps marker
     function openMarker(place, marker) {
         map.setCenter(marker.getPosition());
         marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -167,7 +178,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
         yelpHelper.getYelpPlace(place.id, marker);
     }
 
-    // Clear out places from list view
+    // Function that clears out places array
     self.clearPlaces = function(){
         var length = self.places().length;
         for(var i = 0; i < length; i++ ){
@@ -177,45 +188,60 @@ function ViewModel(searchText, useDefaultPlaces ) {
         self.places.removeAll();
     };
 
+    // Function that that will open a place's marker when clicked in list view
     self.getYelpInfo = function(place){
-        //check to see if screen is small and menu is open
+        // Close the menu if the screen is small
         if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
-            self.toggleMenu();
+            changeMenuState(place.marker.getPosition());
         }
+        // Opens relevant marker
         openMarker(place, place.marker);
     };
 
-    // Toggles the menu sidebar to open or close
+    // Exposed view model function to call animateMenu
     self.toggleMenu = function(){
+        var position = {
+            lat: userPosition.coords.latitude,
+            lng: userPosition.coords.longitude
+        };
+        changeMenuState(position);
+    };
+
+    // Animates the menu sidebar to open or close
+    function changeMenuState(position){
         var mapDiv = $('#map');
         var menu = $('#menu');
         mapDiv.toggleClass('map-close');
         menu.toggleClass('menu-close');
-        //Resize map and pan back to center
+        // Resize map and pan back to center
         setTimeout(function () {
             var content = infoWindow.getContent();
             google.maps.event.trigger(map, 'resize');
-            map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+            map.panTo(position);
             infoWindow.setContent(content);
         }, 500);
-    };
+    }
 
     // Function to hold all yelp api relatated functions
     function YelpHelper(){
 
-        //Local Variables Need for API Calls
+        // Local Variables Need for API Calls
         var xhr;
         var YELP_KEY = 'pV7R7vzUXJEFfl3Dj4retQ',
             YELP_TOKEN = 'VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL',
             YELP_KEY_SECRET = 't4CQ3YyzkgP26-lDGp1pVoLOFks',
             YELP_TOKEN_SECRET = 'SB5H01fW3LCNi3qyO7uaJ59DK9U';
 
+        // Generates random string
         function nonce_generate() {
             return (Math.floor(Math.random() * 1e12).toString());
         }
 
+        // Function for getting additional information about place selected
         function getYelpPlace(placeId, marker) {
-            var yelp_url = 'https://api.yelp.com/v2/business/' + placeId;
+            // Declare local variables
+            var yelp_url = 'https://api.yelp.com/v2/business/' + placeId;  // Yelp business search url
+            // Parameters required for oauth yelp api request
             var parameters = {
                 oauth_consumer_key: YELP_KEY,
                 oauth_token: YELP_TOKEN,
@@ -225,9 +251,11 @@ function ViewModel(searchText, useDefaultPlaces ) {
                 oauth_version: '1.0',
                 callback: 'cb',
             };
+            // Add encoded oauth signature to ajax parameters
             var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
             parameters.oauth_signature = encodedSignature;
 
+            // Open infoWindow for marker and pan map to the marker
             infoWindow.open(map, marker);
             infoWindow.setContent('Loading Yelp Data...');
             map.panTo(marker.getPosition());
@@ -238,7 +266,8 @@ function ViewModel(searchText, useDefaultPlaces ) {
                 data: parameters,
                 cache: true,
                 dataType: 'jsonp'
-            }).done(function(result) {
+            }).done(function(result) { // Success callback
+                // Set infoWindow content for marker that was click to display yelp info
                 var content = '<div class="place-container"><div class="place-image">' +
                     (result.image_url !== undefined ? '<img src="' + result.image_url + '"/>' : '<div>No image available</div>') +
                     '</div><div class="place-info">' +
@@ -248,24 +277,23 @@ function ViewModel(searchText, useDefaultPlaces ) {
                     (result.url !== undefined ? '<p><a href="' + result.url + '">Find Out More</a></p>': '') +
                     '</div></div>';
                 infoWindow.setContent(content);
-            }).fail(function(jqXHR, textStatus){
+            }).fail(function(jqXHR, textStatus){ // Error callback
+                // Handle error and indicate in infoWindow that an error occurred loading the data
                 handleError();
                 infoWindow.setContent('Error loading data.');
             });
         }
 
-
+        // Function for getting the list of yelp results based on search term
         function getYelpPlaces(term) {
-            console.log("get yelp places");
+            // Check to see if the current ajax request is in progress. If it is, abort
             if(xhr && xhr.readyState != 4){
                 xhr.abort();
             }
-
-            var center = map.getCenter();
-
-            var yelp_url = 'https://api.yelp.com/v2/search';
-
-            var parameters = {
+            // Declare local variables
+            var center = map.getCenter(); // Get map center to pass coordinates to query
+            var yelp_url = 'https://api.yelp.com/v2/search'; // Yelp general search url
+            var parameters = { // Parameter required for oauth yelp api request
                 oauth_consumer_key: YELP_KEY,
                 oauth_token: YELP_TOKEN,
                 oauth_nonce: nonce_generate(),
@@ -277,22 +305,23 @@ function ViewModel(searchText, useDefaultPlaces ) {
                 term: term,
                 ll: center.lat() + ',' + center.lng()
             };
-
+            // Add encoded oauth signature to ajax parameters
             var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
             parameters.oauth_signature = encodedSignature;
-
-            // Send AJAX query via jQuery library.
+            // Send AJAX query via jQuery library
             xhr = $.ajax({
                 url: yelp_url,
                 data: parameters,
                 cache: true,
                 dataType: 'jsonp'
-            }).done(function(result) {
+            }).done(function(result) { // Successful callback
+                // If successful, clear out places array and add new places into it
                 self.clearPlaces();
                 result.businesses.forEach(function(place){
                     addPlace(place);
                 });
-            }).fail(function(jqXHR, textStatus) {
+            }).fail(function(jqXHR, textStatus) { // Error callback
+                // Handle error, but ignore aborted requests, because we most likely aborted that request
                 if(textStatus !== 'abort'){
                     handleError();
                 }
@@ -303,18 +332,19 @@ function ViewModel(searchText, useDefaultPlaces ) {
             getYelpPlace : getYelpPlace,
             getYelpPlaces : getYelpPlaces
         };
-
     }
-
 }
 
-//Init Map Callback once Google Maps API is downloadeed
+//Init Map Callback once Google Maps API is downloaded
 var initMap = function() {
     'use strict';
 
+    // Attempt to get users geolocation
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
+    // Successful callback when the users geolocation information can be accessed
     function geoSuccess(position) {
+        //Initialize the map using the users location
         userPosition = position;
         map = new google.maps.Map(document.getElementById('map'), {
             center: {
@@ -329,7 +359,9 @@ var initMap = function() {
         ko.applyBindings(new ViewModel('art gallery', false));
     }
 
+    // Error callback when user's geolocation cannot be accessed
     function geoError(error) {
+        // Initialize the map using default location and places
         alert('Showing search results for "art gallery" near default location of Washington DC because we could not access geolocation data');
         map = new google.maps.Map(document.getElementById('map'), {
             center: {
@@ -351,12 +383,12 @@ var initMap = function() {
     }
 };
 
-
-
+// Error handler function which alerts user an error has occurred
 var handleError = function(){
     alert('Something has gone wrong. Please try refreshing the page.');
 };
 
+// Global catch for all errors that may occur but don't get handled
 window.onerror = function(){
     handleError();
 };
