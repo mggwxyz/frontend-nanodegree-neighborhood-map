@@ -3,11 +3,8 @@
 
 //Global variables
 var google, map, userPosition, infoWindow, yelpHelper;
-var LAT = 38.9072;
-var LNG = -77.0369;
-var ko = ko;
-var console = console;
-var $ = $;
+var LAT = 38.9072,
+    LNG = -77.0369;
 
 //Hard-Coded Destinations
 var defaultPlaces = [{
@@ -115,7 +112,6 @@ function ViewModel(searchText, useDefaultPlaces ) {
 
     //KO Subscription that watches the search observable and searches places for list
     self.search = ko.computed(function() {
-        console.log("search function called");
         if (self.searchText().trim() !== '') {
             yelpHelper.getYelpPlaces(self.searchText().trim());
         } else {
@@ -139,7 +135,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
 
     self.addPlace = ko.computed({
         read: function(){
-            return "";
+            return '';
         },
         write: function(place) {
             var marker = new google.maps.Marker({
@@ -169,7 +165,6 @@ function ViewModel(searchText, useDefaultPlaces ) {
 
     // Clear out places from list view
     self.clearPlaces = function(){
-        console.log("clear places function called");
         var length = self.places().length;
         for(var i = 0; i < length; i++ ){
             var removedPlace = self.places().shift();
@@ -260,7 +255,6 @@ function ViewModel(searchText, useDefaultPlaces ) {
 
 
         function getYelpPlaces(term) {
-            console.log("Getting yelp places for ", term);
             if(xhr && xhr.readyState != 4){
                 xhr.abort();
             }
@@ -318,8 +312,6 @@ function ViewModel(searchText, useDefaultPlaces ) {
 var initMap = function() {
     'use strict';
 
-    google = google;
-
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
     function geoSuccess(position) {
@@ -362,5 +354,5 @@ var initMap = function() {
 
 
 var handleError = function(){
-
+    alert('Something has gone wrong. Please try refreshing the page.');
 };
