@@ -1,51 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Neighborhood Map</title>
         <meta name="viewport" content="initial-scale=1.0">
         <meta charset="utf-8">
-        <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
-        <link href="app.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+        <link href="images/favicon.png" rel="Neighborhood Map Icon" type="image/png">
+        <link href="./styles/app.css" rel="stylesheet">
     </head>
     <body>
-        <main>
-            <section id="menu" class="menu">
-                <header>
-                    <a href="https://github.com/mgg9xv/neighborhood-map">
-                        <img id="github-icon" class="github-icon" src="images/github-icon.svg" alt="github icon"/>
-                    </a>
-                    <h1>Neighborhood Map</h1>
-                    <img id="map-icon" onclick="toggleMenu()" class="map-icon" src="images/map-icon.svg" title="Fullscreen Map Mode" alt="map icon"/>
-                </header>
-                <section id="input-pane">
-                    <div class="input-container">
-                        <label for="search">Search </label><input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="textInput: search">
-                    </div>
-                    <div class="input-container">
-                        <label for="filter">Filter </label><input id="filter" name="filter" type="text" placeholder="Type here to filter out places..."/ data-bind="textInput: filter">
-                    </div>
-                </section>
-                <section id="places-pane">
-                    <ul data-bind="foreach: { data: places , as: 'place'}">
-                        <li data-bind="if: place.show">
-                            <a data-bind="click: $parent.getYelpInfo" href="">
-                                <div class="place-name" data-bind="text: place.name"></div>
-                            </a>
-                        </li>
-                    </ul>
-                </section>
+        <!-- Menu -->
+        <section id="menu" class="menu">
+            <header>
+                <a href="https://github.com/mgg9xv/neighborhood-map">
+                    <img id="github-icon" class="github-icon" src="images/github-icon.svg" alt="github icon">
+                </a>
+                <h1>Neighborhood Map</h1>
+                <a href="" data-bind="click: toggleMenu">
+                    <img id="map-icon" class="map-icon" src="images/map-icon.svg" title="Close Map Menu" alt="Close Map Menu">
+                </a>
+            </header>
+            <section id="input-pane">
+                <div class="input-container">
+                    <label for="search">Search</label>
+                    <input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="value: searchText, valueUpdate: 'keyup'">
+                </div>
+                <div class="input-container">
+                    <label for="filter">Filter</label>
+                    <input id="filter" name="filter" type="text" placeholder="Type here to filter out places..." data-bind="value: filterText, valueUpdate: 'keyup'">
+                </div>
             </section>
-            <section id="map" class="map map-close"></section>
-            <img id="menu-icon" onclick="toggleMenu()" class="menu-icon" src="images/hamburger.svg" alt="menu icon"/>
-        </main>
+            <section id="places-pane">
+                <ul data-bind="foreach: { data: places , as: 'place'}">
+                    <li data-bind="if: place.show">
+                        <a data-bind="click: $parent.getYelpInfo" href="">
+                            <div class="place-name" data-bind="text: place.name"></div>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </section>
 
+        <!-- Map -->
+        <main id="map" class="map map-close"></main>
+
+        <!-- Open Menu Icon -->
+        <img id="menu-icon" data-bind="click: toggleMenu" class="menu-icon" src="images/hamburger.svg" title="Open Map Menu" alt="Open Map Menu">
 
         <!-- Javascript -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
-        <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
         <script src="node_modules/oauth-signature/dist/oauth-signature.min.js"></script>
-        <script type="text/javascript "src="app.js"></script>
+        <script src="./js/app.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer></script>
     </body>
 </html>

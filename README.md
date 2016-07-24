@@ -18,6 +18,8 @@ git clone https://github.com/mgg9xv/neighborhood-map.git
 
 
 ## Running the project <a name="running-the-project"></a>
+>If you don't care to run the project locally, simply visit [http://mgg9xv.github.io/neighborhood-map](http://mgg9xv.github.io/neighborhood-map)
+
 1. Navigate to the neighborhood-map directory that was created when downloading the project
 
     ```
@@ -28,15 +30,14 @@ git clone https://github.com/mgg9xv/neighborhood-map.git
     ```
     npm install
     ```
-3. Open `index.html` using your favorite browser
+3. Start up a local web server
 
     ```
-    open index.html
+    httpserver
     ```
+4. Navigate to  [http://localhost:8080](http://localhost:8080) in you favorite browser
 
-    OR
 
-    Go to [http://mgg9xv.github.io/neighborhood-map](http://mgg9xv.github.io/neighborhood-map)
 
 
 
