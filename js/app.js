@@ -2,7 +2,7 @@
 /*global window: false */
 
 // Global variables
-var google, map, userPosition, infoWindow, yelpHelper,
+var google, map, userPosition, infoWindow,
     LAT = 38.9072,
     LNG = -77.0369;
 
