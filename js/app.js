@@ -105,7 +105,8 @@ function ViewModel(searchText, useDefaultPlaces ) {
 
     var self = this;
     var yelpHelper = new YelpHelper();
-    self.useDefaultPlaces = ko.observable(useDefaultPlaces);
+    var initialized = false;
+    var dflt = useDefaultPlaces;
     self.searchText = ko.observable(searchText);
     self.filterText = ko.observable('');
     self.places = ko.observableArray([]);
@@ -113,7 +114,15 @@ function ViewModel(searchText, useDefaultPlaces ) {
     //KO Subscription that watches the search observable and searches places for list
     self.search = ko.computed(function() {
         if (self.searchText().trim() !== '') {
-            yelpHelper.getYelpPlaces(self.searchText().trim());
+            if(self.searchText().trim() === 'art gallery' && dflt && !initialized ){
+                var i;
+                for(i = 0; i < defaultPlaces.length ; i++){
+                    addPlace(defaultPlaces[i]);
+                }
+                initialized = true;
+            } else {
+                yelpHelper.getYelpPlaces(self.searchText().trim());
+            }
         } else {
             self.clearPlaces();
         }
@@ -133,35 +142,30 @@ function ViewModel(searchText, useDefaultPlaces ) {
         });
     });
 
-    self.addPlace = ko.computed({
-        read: function(){
-            return '';
-        },
-        write: function(place) {
-            var marker = new google.maps.Marker({
-                map: map,
-                position: {
-                    lng: place.location.coordinate.longitude,
-                    lat: place.location.coordinate.latitude
-                },
-                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-            });
+    function addPlace(place){
+        var marker = new google.maps.Marker({
+            map: map,
+            position: {
+                lng: place.location.coordinate.longitude,
+                lat: place.location.coordinate.latitude
+            },
+            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        });
 
-            marker.addListener('click', openMarker);
-            place.marker = marker;
-            place.show = ko.observable(true);
-            self.places.push(place);
+        marker.addListener('click', function(){openMarker(place, marker);}, false);
+        place.marker = marker;
+        place.show = ko.observable(true);
+        self.places.push(place);
+    }
 
-            function openMarker() {
-                map.setCenter(marker.getPosition());
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-                setTimeout(function() {
-                    marker.setAnimation(null);
-                }, 700);
-                yelpHelper.getYelpPlace(place.id, marker);
-            }
-        }
-    });
+    function openMarker(place, marker) {
+        map.setCenter(marker.getPosition());
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
+            marker.setAnimation(null);
+        }, 700);
+        yelpHelper.getYelpPlace(place.id, marker);
+    }
 
     // Clear out places from list view
     self.clearPlaces = function(){
@@ -175,10 +179,10 @@ function ViewModel(searchText, useDefaultPlaces ) {
 
     self.getYelpInfo = function(place){
         //check to see if screen is small and menu is open
-        if(Window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
+        if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
             self.toggleMenu();
         }
-        yelpHelper.getYelpPlace(place.id, place.marker);
+        openMarker(place, place.marker);
     };
 
     // Toggles the menu sidebar to open or close
@@ -223,38 +227,36 @@ function ViewModel(searchText, useDefaultPlaces ) {
             };
             var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
             parameters.oauth_signature = encodedSignature;
-            var settings = {
-                url: yelp_url,
-                data: parameters,
-                cache: true,
-                dataType: 'jsonp',
-                success: function(result) {
-                    var node = document.createElement('DIV');
-                    node.innerHTML = '<div class="place-container"><div class="place-image">' +
-                        '<img src="' + result.image_url + '"/>' +
-                        '</div><div class="place-info">' +
-                        '<p><strong>Name:</strong> ' + result.name + '</p>' +
-                        '<p><strong>Phone:</strong> ' + result.display_phone + '</p>' +
-                        '<p><strong>Rating:</strong> ' + result.rating + '</p>' +
-                        '<p><a href="' + result.url + '">Find Out More</a></p>' +
-                        '</div></div>';
-                    infoWindow.setContent(node);
-                },
-                error: function(result) {
-                    console.log('Error: ' + result);
-                    infoWindow.setContent('Error loading data.');
 
-                }
-            };
             infoWindow.open(map, marker);
             infoWindow.setContent('Loading Yelp Data...');
             map.panTo(marker.getPosition());
+
             // Send AJAX query via jQuery library.
-            $.ajax(settings);
+            $.ajax({
+                url: yelp_url,
+                data: parameters,
+                cache: true,
+                dataType: 'jsonp'
+            }).done(function(result) {
+                var content = '<div class="place-container"><div class="place-image">' +
+                    (result.image_url !== undefined ? '<img src="' + result.image_url + '"/>' : '<div>No image available</div>') +
+                    '</div><div class="place-info">' +
+                    '<p><strong>Name:</strong> ' + (result.name !== undefined ? result.name : 'N/A') + '</p>' +
+                    '<p><strong>Phone:</strong> ' + (result.display_phone !== undefined ? result.display_phone : 'N/A') + '</p>' +
+                    '<p><strong>Rating:</strong> ' + (result.rating !== undefined ? result.rating : 'N/A') + '</p>' +
+                    (result.url !== undefined ? '<p><a href="' + result.url + '">Find Out More</a></p>': '') +
+                    '</div></div>';
+                infoWindow.setContent(content);
+            }).fail(function(jqXHR, textStatus){
+                handleError();
+                infoWindow.setContent('Error loading data.');
+            });
         }
 
 
         function getYelpPlaces(term) {
+            console.log("get yelp places");
             if(xhr && xhr.readyState != 4){
                 xhr.abort();
             }
@@ -279,24 +281,22 @@ function ViewModel(searchText, useDefaultPlaces ) {
             var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
             parameters.oauth_signature = encodedSignature;
 
-            var settings = {
+            // Send AJAX query via jQuery library.
+            xhr = $.ajax({
                 url: yelp_url,
                 data: parameters,
                 cache: true,
-                dataType: 'jsonp',
-                success: function(result) {
-                    self.clearPlaces();
-                    result.businesses.forEach(function(place){
-                        self.addPlace(place);
-                    });
-                },
-                error: function(result) {
-                    console.log('Error: ' + result);
+                dataType: 'jsonp'
+            }).done(function(result) {
+                self.clearPlaces();
+                result.businesses.forEach(function(place){
+                    addPlace(place);
+                });
+            }).fail(function(jqXHR, textStatus) {
+                if(textStatus !== 'abort'){
+                    handleError();
                 }
-            };
-
-            // Send AJAX query via jQuery library.
-            xhr = $.ajax(settings);
+            });
         }
 
         return {
@@ -330,7 +330,7 @@ var initMap = function() {
     }
 
     function geoError(error) {
-        console.log('Geolocation Error: ' + error.code);
+        alert('Showing search results for "art gallery" near default location of Washington DC because we could not access geolocation data');
         map = new google.maps.Map(document.getElementById('map'), {
             center: {
                 lat: LAT,
@@ -355,4 +355,8 @@ var initMap = function() {
 
 var handleError = function(){
     alert('Something has gone wrong. Please try refreshing the page.');
+};
+
+window.onerror = function(){
+    handleError();
 };
