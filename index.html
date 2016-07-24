@@ -6,7 +6,7 @@
         <meta charset="utf-8">
         <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
-        <link href="images/favicon.png" rel="Neighborhood Map Icon" type="image/png">
+        <link href="images/favicon.png" rel="icon" type="image/png">
         <link href="./styles/app.css" rel="stylesheet">
     </head>
     <body>
@@ -21,7 +21,7 @@
                     <img id="map-icon" class="map-icon" src="images/map-icon.svg" title="Close Map Menu" alt="Close Map Menu">
                 </a>
             </header>
-            <section id="input-pane">
+            <div id="input-pane">
                 <div class="input-container">
                     <label for="search">Search</label>
                     <input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="value: searchText, valueUpdate: 'keyup'">
@@ -30,8 +30,8 @@
                     <label for="filter">Filter</label>
                     <input id="filter" name="filter" type="text" placeholder="Type here to filter out places..." data-bind="value: filterText, valueUpdate: 'keyup'">
                 </div>
-            </section>
-            <section id="places-pane">
+            </div>
+            <div id="places-pane">
                 <ul data-bind="foreach: { data: places , as: 'place'}">
                     <li data-bind="if: place.show">
                         <a data-bind="click: $parent.getYelpInfo" href="">
@@ -39,7 +39,7 @@
                         </a>
                     </li>
                 </ul>
-            </section>
+            </div>
         </section>
 
         <!-- Map -->

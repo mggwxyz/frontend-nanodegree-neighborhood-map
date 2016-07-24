@@ -113,7 +113,7 @@ input {
   z-index: 2;
   transition-property: top, left, box-shadow;
   transition-duration: 0.5s;
-  transition-timing-function: ease-out-in;
+  transition-timing-function: ease-in-out;
   box-shadow: none;
 }
 
@@ -131,7 +131,6 @@ ul {
 
 li {
   background-color: white;
-  color: lightgrey;
   display: block;
   color: #222222;
   text-decoration: none;
@@ -243,7 +242,7 @@ li:hover > a > div.place-name {
 }
 
 p {
-  padding: 0.2rem 0rem;
+  padding: 0.2rem 0;
 }
 
 a {
