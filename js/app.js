@@ -192,14 +192,23 @@ function ViewModel(searchText, useDefaultPlaces ) {
     self.getYelpInfo = function(place){
         // Close the menu if the screen is small
         if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
-            self.toggleMenu();
+            changeMenuState(place.marker.getPosition());
         }
         // Opens relevant marker
         openMarker(place, place.marker);
     };
 
-    // Toggles the menu sidebar to open or close
+    // Exposed view model function to call animateMenu
     self.toggleMenu = function(){
+        var position = {
+            lat: userPosition.coords.latitude,
+            lng: userPosition.coords.longitude
+        };
+        changeMenuState(position);
+    };
+
+    // Animates the menu sidebar to open or close
+    function changeMenuState(position){
         var mapDiv = $('#map');
         var menu = $('#menu');
         mapDiv.toggleClass('map-close');
@@ -208,10 +217,10 @@ function ViewModel(searchText, useDefaultPlaces ) {
         setTimeout(function () {
             var content = infoWindow.getContent();
             google.maps.event.trigger(map, 'resize');
-            map.panTo({lat: userPosition.coords.latitude, lng: userPosition.coords.longitude});
+            map.panTo(position);
             infoWindow.setContent(content);
         }, 500);
-    };
+    }
 
     // Function to hold all yelp api relatated functions
     function YelpHelper(){
