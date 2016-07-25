@@ -142,6 +142,10 @@ function ViewModel(searchText, useDefaultPlaces ) {
         var regex = new RegExp(self.filterText(), 'i');
         self.places().forEach(function(place) {
             if (place.name.search(regex) == -1) {
+                // Close open infowindow if the place is being filtered
+                if( infoWindow.getPosition() === place.marker.getPosition()){
+                    infoWindow.close();
+                }
                 place.show(false);
                 place.marker.setVisible(false);
             } else {
