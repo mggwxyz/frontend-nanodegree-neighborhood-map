@@ -2,8 +2,8 @@
 The purposed of this project was to gain experience using front-end javascript frameworks and researching APIs. The application developed allows you to search for places within your neighborhood utilizing the Yelp API. I also used the Google Maps API and Knockout.js
 
 ## Quick Links
-* [GitHub Repository](http://github.com/mgg9xv/neighborhood-map)
-* [GitHub Pages](http://mgg9xv.github.io/neighborhood-map)
+* [GitHub Repository](http://github.com/mggwxyz/neighborhood-map)
+* [GitHub Pages](http://mggwxyz.github.io/neighborhood-map)
 
 ## Table of Contents
 1. [Downloading the project](#downloading-the-project)
@@ -13,12 +13,12 @@ The purposed of this project was to gain experience using front-end javascript f
 ## Downloading the project <a name="downloading-the-project"></a>
 Clone the repo into a directory using a terminal
 ```
-git clone https://github.com/mgg9xv/neighborhood-map.git
+git clone https://github.com/mggwxyz/neighborhood-map.git
 ```
 
 
 ## Running the project <a name="running-the-project"></a>
->If you don't care to run the project locally, simply visit [http://mgg9xv.github.io/neighborhood-map](http://mgg9xv.github.io/neighborhood-map)
+>If you don't care to run the project locally, simply visit [http://mggwxyz.github.io/neighborhood-map](http://mggwxyz.github.io/neighborhood-map)
 
 1. Navigate to the neighborhood-map directory that was created when downloading the project
 
