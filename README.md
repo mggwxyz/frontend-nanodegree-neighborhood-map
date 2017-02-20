@@ -13,7 +13,7 @@ The purposed of this project was to gain experience using front-end javascript f
 ## Downloading the project <a name="downloading-the-project"></a>
 Clone the repo into a directory using a terminal
 ```
-git clone https://github.com/mgg9xv/neighborhood-map.git
+git clone https://github.com/mggwxyz/neighborhood-map.git
 ```
 
 
