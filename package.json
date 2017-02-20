@@ -1,13 +1,8 @@
 {
   "name": "neighborhood-map",
   "version": "1.0.0",
-<<<<<<< Updated upstream
-  "description": "Udacity Neighborhood Map",
-  "main": "app.js",
-=======
   "description": "Udacity's Front-end Nanodegree Neighborhood Map Project",
   "main": "./js/app.js",
->>>>>>> Stashed changes
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "httpserver"
