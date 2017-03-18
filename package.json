@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map#readme",
   "dependencies": {
-    "httpserver": "^0.2.0",
     "oauth-signature": "^1.3.1"
+  },
+  "devDependencies": {
+    "http-server": "^0.9.0"
   }
 }

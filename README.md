@@ -34,7 +34,7 @@ git clone https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map.git
 3. Start up a local web server
 
     ```
-    httpserver
+    http-server
     ```
 4. Navigate to  [http://localhost:8080](http://localhost:8080) in you favorite browser
 
