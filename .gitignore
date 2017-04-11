@@ -1,5 +1,5 @@
 .idea/
 ngrok
 node_modules/
-.sass-cache/
 dist/
+npm-debug.log
