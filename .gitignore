@@ -1,5 +1,4 @@
 .idea/
 ngrok
 node_modules/
-dist/
 npm-debug.log
