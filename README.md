@@ -1,10 +1,11 @@
-# Udacity's Frontend Nanodegree Neighborhood Map Project
-The purposed of this project was to gain experience using front-end javascript frameworks and learn some new APIs.
-The application developed allows you to search for places within your neighborhood utilizing the Yelp and Google Maps APIs. This project is built using Knockout.js.
+# Udacity's Front-End Web Developer Nanodegree Neighborhood Map Project
+The purpose of this project was to learn a new JavaScript framework (Knockout.js) and utilize public APIs (Yelp, Google Maps).
+The web application allows you to search for places of interest within your surrounding area.
 
 ## Quick Links
-* [GitHub Repository](https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map)
 * [Online Demo](https://mggwxyz.github.io/frontend-nanodegree-neighborhood-map)
+* [Source Code](https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map)
+
 
 ## Table of Contents
 1. [Downloading the project](#downloading-the-project)
