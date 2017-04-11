@@ -163,7 +163,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
                 lng: place.location.coordinate.longitude,
                 lat: place.location.coordinate.latitude
             },
-            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
         });
 
         marker.addListener('click', function(){openMarker(place, marker);}, false);
