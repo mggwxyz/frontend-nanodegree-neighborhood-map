@@ -1,18 +1,18 @@
 {
-  "name": "neighborhood-map",
+  "name": "frontend-nanodegreee-neighborhood-map",
   "version": "1.0.0",
-  "description": "Udacity's Front-end Nanodegree Neighborhood Map Project",
+  "description": "Udacity's Frontend Nanodegree Neighborhood Map Project",
   "main": "./js/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "httpserver"
+    "start": "http-server",
+    "deploy": "gulp build && gh-pages -d dist"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map.git"
   },
   "author": "Michael Gilbertson",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map/issues"
   },
@@ -21,6 +21,19 @@
     "oauth-signature": "^1.3.1"
   },
   "devDependencies": {
-    "http-server": "^0.9.0"
+    "http-server": "^0.9.0",
+    "browser-sync": "^2.17.3",
+    "del": "^2.0.2",
+    "gh-pages": "^0.12.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-cache": "^0.4.6",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-if": "^2.0.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-uglify": "^2.1.2",
+    "gulp-useref": "^3.1.2",
+    "http-server": "^0.9.0",
+    "run-sequence": "^1.2.2"
   }
 }
