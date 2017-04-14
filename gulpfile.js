@@ -11,7 +11,7 @@ var browserSync = require('browser-sync');
 var uglify = require('gulp-uglify');
 
 gulp.task('watch', ['browserSync', 'sass'],function(){
-    gulp.watch('src/scss/*', ['sass']);
+    gulp.watch('src/stylesheets/scss/*', ['sass']);
     gulp.watch('src/*.html', browserSync.reload);
     gulp.watch('src/js/**/*.js', browserSync.reload);
 });
@@ -25,9 +25,9 @@ gulp.task('browserSync', function(){
 });
 
 gulp.task('sass', function(){
-    return gulp.src('src/scss/**/*.scss')
+    return gulp.src('src/stylesheets/scss/**/*.scss')
         .pipe(sass())
-        .pipe(gulp.dest('src/css'))
+        .pipe(gulp.dest('src/stylesheets/css'))
         .pipe(browserSync.reload({
             stream: true
         }));
