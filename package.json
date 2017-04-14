@@ -4,8 +4,10 @@
   "description": "Udacity's Frontend Nanodegree Neighborhood Map Project",
   "main": "./js/app.js",
   "scripts": {
-    "start": "http-server",
-    "serve-build": "gulp build && cd dist && http-server"
+    "start": "gulp build && cd dist && http-server",
+    "dev-server": "gulp develop",
+    "prod-server": "gulp build && cd dist && http-server",
+    "deploy": "gulp build && gh-pages -d dist"
   },
   "repository": {
     "type": "git",

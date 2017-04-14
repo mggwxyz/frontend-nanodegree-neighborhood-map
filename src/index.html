@@ -10,7 +10,7 @@
         <link href="images/favicon.png" rel="icon" type="image/png">
 
         <!--build:css css/main.min.css-->
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="stylesheets/css/main.css">
         <!--endbuild-->
 
     </head>
@@ -53,14 +53,16 @@
         <!-- Open Menu Icon -->
         <img id="menu-icon" data-bind="click: toggleMenu" class="menu-icon" src="images/hamburger.svg" title="Open Map Menu" alt="Open Map Menu">
 
-        <!-- Javascript -->
-        <!--build:js js/main.min.js -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
+
+        <!-- Javascript -->
+        <!--build:js js/main.min.js -->
         <script src="js/oauth-signature.min.js"></script>
         <script src="js/app.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer onerror="handleError()"></script>
         <!-- endbuild -->
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer onerror="handleError()"></script>
 
     </body>
 </html>
