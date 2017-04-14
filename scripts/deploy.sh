@@ -7,6 +7,4 @@ npm i
 
 gulp build
 
-## move build files into current directory
-mv dist/* .
 
