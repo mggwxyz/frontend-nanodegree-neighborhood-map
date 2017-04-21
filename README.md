@@ -1,4 +1,4 @@
-# Udacity's Front-End Web Developer Nanodegree Neighborhood Map Project
+# Front-End Nanodegree Neighborhood Map Project
 The purpose of this project was to learn a new JavaScript framework (Knockout.js) and utilize public APIs (Yelp, Google Maps).
 The web application allows you to search for places of interest within your surrounding area.
 
