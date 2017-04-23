@@ -9,6 +9,9 @@ $titillium: 'Titillium Web', sans-serif;
 
 html,
 body {
+
+    background-color: #E9E8E6;
+
     width: 100%;
     height: 100%;
     font-size: 4vw;
@@ -48,6 +51,7 @@ header {
 }
 
 #input-pane {
+    padding: 0 0 1rem 0rem;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -67,7 +71,7 @@ header {
     display: flex;
     width: 100%;
     padding: 0.5rem;
-    border-radius: 0.1rem;
+    border-radius: 0.2rem;
 }
 
 
@@ -81,7 +85,7 @@ label {
     background-color: $light-blue;
     color: white;
     text-align: center;
-    border-radius: 0.5rem 0 0 0.5rem;
+    border-radius: 0.2rem 0 0 0.2rem;
     text-transform: uppercase;
     vertical-align: middle;
 }
@@ -92,7 +96,7 @@ input {
     margin: 0;
     outline: 0;
     flex-basis: 80%;
-    border-radius: 0 0.5rem 0.5rem 0;
+    border-radius: 0 0.2rem 0.2rem 0;
 }
 
 .place-name {
@@ -150,7 +154,7 @@ li {
     margin: 0.5rem;
 
     border: 1px solid $dark-color;
-    border-radius: 0.1rem;
+    border-radius: 0.2rem;
     font-family: $titillium;
 }
 
@@ -190,7 +194,7 @@ li:hover > a > div.place-name {
     padding: 0.5rem;
     margin: 0.5rem;
     background-color: $dark-color;
-    border-radius: 0.5rem;
+    border-radius: 0.2rem;
     border: 1px solid white;
 }
 
@@ -200,7 +204,7 @@ li:hover > a > div.place-name {
     padding: 0.5rem;
     margin: 0.5rem;
     background-color: $dark-color;
-    border-radius: 0.5rem;
+    border-radius: 0.2rem;
     border: 1px solid white;
 }
 
@@ -212,7 +216,7 @@ li:hover > a > div.place-name {
     height: 3rem;
     padding: 1rem;
     background-color: $dark-color;
-    border-radius: 0.5rem;
+    border-radius: 0.2rem;
     margin: 1rem;
 
   &:hover {
