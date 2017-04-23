@@ -365,8 +365,14 @@ var initMap = function() {
             mapTypeControl: false
         });
         infoWindow = new google.maps.InfoWindow();
+
         //Applying the bindings to the view model
         ko.applyBindings(new ViewModel('art gallery', false));
+
+        var mapLoader = document.getElementById("map-loader");
+        if ( mapLoader !== null ) {
+            document.getElementById("map-loader").className += ' hidden';
+        }
     }
 
     // Error callback when user's geolocation cannot be accessed
@@ -388,9 +394,16 @@ var initMap = function() {
             }
         };
         infoWindow = new google.maps.InfoWindow();
+
         //Applying the bindings to the view model
         ko.applyBindings(new ViewModel('art gallery', true));
+
+        var mapLoader = document.getElementById("map-loader");
+        if ( mapLoader !== null ) {
+            document.getElementById("map-loader").className += ' hidden';
+        }
     }
+
 };
 
 // Error handler function which alerts user an error has occurred
