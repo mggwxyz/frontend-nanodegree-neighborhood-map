@@ -407,13 +407,13 @@ var initMap = function() {
 };
 
 // Error handler function which alerts user an error has occurred
-var handleError = function(){
-    alert('Something has gone wrong. Please try refreshing the page.');
+var handleError = function(error){
+    console.log('Something has gone wrong. Please try refreshing the page. ',  error);
 };
 
 // Global catch for all errors that may occur but don't get handled
-window.onerror = function(){
-    handleError();
+window.onerror = function(error){
+    handleError(error);
 };
 
 function removePageLoader(){
