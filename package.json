@@ -1,12 +1,12 @@
 {
   "name": "frontend-nanodegreee-neighborhood-map",
   "version": "1.0.0",
-  "description": "Udacity's Frontend Nanodegree Neighborhood Map Project",
+  "description": "A neighborhood map application for Udacity's Front-End Web Developer Nanodegree",
   "main": "./js/app.js",
   "scripts": {
     "start": "gulp build && cd dist && http-server",
-    "dev-server": "gulp develop",
-    "prod-server": "gulp build && cd dist && http-server",
+    "dev": "gulp develop",
+    "prod": "gulp build && cd dist && http-server",
     "deploy": "gulp build && gh-pages -d dist"
   },
   "repository": {

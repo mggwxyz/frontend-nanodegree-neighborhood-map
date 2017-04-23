@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
     <head>
-
         <title>Neighborhood Map | Front-End Nanodegree</title>
 
         <meta charset="utf-8">
@@ -9,12 +8,71 @@
 
         <link href="images/favicon.png" rel="icon" type="image/png">
 
+        <style>
+            html, body {
+                box-sizing: border-box;
+                font-size: 16px;
+                height: 100%;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                border: 0;
+                background-color: black;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                border: 0;
+            }
+            .loader-container {
+                font-family: "Lucida Console", Monaco, monospace;
+                font-size: 16px;
+                height: 100%;
+                width: 100%;
+                background-color: white;
+                text-align: center;
+                z-index: 999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .loader {
+                height: 3em;
+                width: 3em;
+                border-top: 0.5em solid #1e77e2;
+                border-bottom: 0.5em solid #f6f6f6;
+                border-right: 0.5em solid #1e77e2;
+                border-left: 0.5em solid #f6f6f6;
+                border-radius: 100%;
+                animation: spin 3s linear 0.5s infinite normal;
+            }
+            .loader-container.hidden {
+                display:none;
+            }
+
+            #page-loader {
+                position: fixed;
+                z-index: 100;
+            }
+
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+
+        </style>
+
         <!--build:css stylesheets/css/main.min.css-->
         <link rel="stylesheet" href="stylesheets/css/main.css">
         <!--endbuild-->
 
     </head>
     <body>
+
+        <div id="page-loader" class="loader-container">
+            <div class="loader"></div>
+        </div>
 
         <!-- Menu -->
         <section id="menu" class="menu">
@@ -37,14 +95,20 @@
                     <input id="filter" name="filter" type="text" placeholder="Type here to filter out places..." data-bind="value: filterText, valueUpdate: 'keyup'">
                 </div>
             </div>
-            <div id="places-pane">
-                <ul data-bind="foreach: { data: places , as: 'place'}">
-                    <li data-bind="if: place.show">
+            <div id="places-pane" class="is-loading">
+                <div id="places-loader" class="loader-container">
+                    <div class="loader"></div>
+                </div>
+                <ul data-bind="{ foreach: places, css: { hidden: loadingPlaces } }" class="hidden" >
+                    <!-- ko if: show -->
+                    <li>
                         <a data-bind="click: $parent.getYelpInfo" href="">
-                            <div class="place-name" data-bind="text: place.name"></div>
+                            <div class="place-name" data-bind="text: name"></div>
                         </a>
                     </li>
+                    <!-- /ko -->
                 </ul>
+                <!-- /ko -->
             </div>
         </section>
 

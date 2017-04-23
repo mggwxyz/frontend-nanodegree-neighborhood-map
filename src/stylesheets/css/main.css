@@ -417,6 +417,7 @@ header {
   background-color: #1e77e2; }
 
 #places-pane {
+  background-color: white;
   display: flex;
   flex-direction: column;
   flex-basis: 80%;
@@ -495,6 +496,7 @@ li {
   color: #222222;
   text-decoration: none;
   margin: 0.5rem;
+  border: 1px solid #1e77e2;
   border-radius: 0.1rem;
   font-family: "Titillium Web", sans-serif; }
 
@@ -517,6 +519,9 @@ li:hover > a > div.place-name {
   transition-property: width;
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out; }
+
+.hidden {
+  display: none; }
 
 .map-icon {
   width: 3rem;
@@ -546,6 +551,8 @@ li:hover > a > div.place-name {
   background-color: #1e77e2;
   border-radius: 0.5rem;
   margin: 1rem; }
+  .menu-icon:hover {
+    cursor: pointer; }
 
 .logo-close {
   transform: none;

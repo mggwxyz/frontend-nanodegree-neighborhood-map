@@ -55,6 +55,7 @@ header {
 }
 
 #places-pane {
+  background-color: white;
     display: flex;
     flex-direction: column;
     flex-basis: 80%;
@@ -147,6 +148,8 @@ li {
     color: #222222;
     text-decoration: none;
     margin: 0.5rem;
+
+    border: 1px solid $dark-color;
     border-radius: 0.1rem;
     font-family: $titillium;
 }
@@ -176,6 +179,9 @@ li:hover > a > div.place-name {
     transition-timing-function: ease-in-out;
 }
 
+.hidden {
+  display: none;
+}
 
 
 .map-icon {
@@ -208,6 +214,10 @@ li:hover > a > div.place-name {
     background-color: $dark-color;
     border-radius: 0.5rem;
     margin: 1rem;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 

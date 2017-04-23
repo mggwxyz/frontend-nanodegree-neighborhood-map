@@ -113,6 +113,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
     self.searchText = ko.observable(searchText); // Observable for search input text
     self.filterText = ko.observable(''); // Observable for filter input text
     self.places = ko.observableArray([]); // Obserable Array for all places in list
+    self.loadingPlaces = ko.observable(true);
 
     // KO computed observable that watches changes to the search observable and qeuries yelp for relevant places
     self.search = ko.computed(function() {
@@ -294,6 +295,8 @@ function ViewModel(searchText, useDefaultPlaces ) {
             if(xhr && xhr.readyState != 4){
                 xhr.abort();
             }
+            self.loadingPlaces(true);
+
             // Declare local variables
             var center = map.getCenter(); // Get map center to pass coordinates to query
             var yelp_url = 'https://api.yelp.com/v2/search'; // Yelp general search url
@@ -319,6 +322,9 @@ function ViewModel(searchText, useDefaultPlaces ) {
                 cache: true,
                 dataType: 'jsonp'
             }).done(function(result) { // Successful callback
+                document.getElementById("places-loader").className += ' hidden';
+                self.loadingPlaces(false);
+
                 // If successful, clear out places array and add new places into it
                 self.clearPlaces();
                 result.businesses.forEach(function(place){
@@ -396,3 +402,14 @@ var handleError = function(){
 window.onerror = function(){
     handleError();
 };
+
+function removePageLoader(){
+   var pageLoader =  document.getElementById('page-loader');
+   document.body.removeChild(pageLoader);
+}
+
+if ( document.readyState = 'complete' || (document.readyState = 'loading' && !document.documentElement.doScroll )) {
+    removePageLoader();
+} else {
+    document.addEventListener('DOMContentLoaded', removePageLoader );
+}
