@@ -1,47 +1,41 @@
-# Front-End Nanodegree Neighborhood Map Project
-The purpose of this project was to learn a new JavaScript framework (Knockout.js) and utilize public APIs (Yelp, Google Maps).
-The web application allows you to search for places of interest within your surrounding area.
+# Neighborhood Map | Front-End Nanodegree
 
-## Quick Links
-* [Online Demo](https://mggwxyz.github.io/frontend-nanodegree-neighborhood-map)
-* [Source Code](https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map)
+A neighborhood map application for Udacity's Front-End Web Developer Nanodegree
 
+## Try It Out
+[https://mggwxyz.github.io/frontend-nanodegree-neighborhood-map](https://mggwxyz.github.io/frontend-nanodegree-neighborhood-map)
 
 ## Table of Contents
-1. [Downloading the project](#downloading-the-project)
+1. [Project Overview](#project-overview)
+1. [Setting up the project](#setting-up-the-project)
 1. [Running the project](#running-the-project)
-1. [Using the project](#using-the-project)
+1. [Resource Links](#resource-links)
 
-## Downloading the project <a name="downloading-the-project"></a>
-Clone the repo into a directory using a terminal
-```
+## Project Overview
+
+The purpose of this project was to gain experience building responsive web pages using HTML, CSS, and JavaScript. This project was part of Udacity's Front-End Web Developer Nanodegree.
+
+## Setting up the project
+Clone the git repository into a directory using a bash terminal
+```bash
 git clone https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map.git
+````
+
+Navigate into the new project directory
+```bash
+cd frontend-nanodegree-neighborhood-map
 ```
 
+Download the project's dependencies
+```bash
+npm install
+```
 
-## Running the project <a name="running-the-project"></a>
->If you don't care to run the project locally, simply visit [https://mggwxyz.github.io/frontend-nanodegree-neighborhood-map](https://mggwxyz.github.io/frontend-nanodegree-neighborhood-map)
-
-1. Navigate to the neighborhood-map directory that was created when downloading the project
-
-    ```
-    cd neighborhood-map
-    ```
-2. Download node modules
-
-    ```
-    npm install
-    ```
-3. Start up a local web server
-
-    ```
-    npm start
-    ```
-4. Navigate to  [http://localhost:8080](http://localhost:8080) in you favorite browser
-
-
-
-
+## Running the project
+Once the project has been setup, it can be started up at `http://127.0.0.1:8080`
+```bash
+npm start
+```
 
 ## Using the project <a name="using-the-project"></a>
 
