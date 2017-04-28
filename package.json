@@ -4,9 +4,9 @@
   "description": "A neighborhood map application for Udacity's Front-End Web Developer Nanodegree",
   "main": "./js/app.js",
   "scripts": {
-    "start": "gulp build && cd dist && http-server",
+    "start": "gulp build && cd dist && http-server -p 8080 -o",
     "dev": "gulp develop",
-    "prod": "gulp build && cd dist && http-server",
+    "demo": "gulp build && cd dist && http-server -p 8080 -o",
     "deploy": "gulp build && gh-pages -d dist"
   },
   "repository": {
