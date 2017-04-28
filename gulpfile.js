@@ -9,10 +9,13 @@ var del = require('del');
 var runSequence = require('run-sequence');
 var browserSync = require('browser-sync');
 var uglify = require('gulp-uglify');
+var pug = require('gulp-pug');
 
-gulp.task('watch', ['browserSync', 'sass'],function(){
-    gulp.watch('src/stylesheets/scss/*', ['sass']);
+gulp.task('watch', ['browserSync', 'compile-pug-to-html', 'compile-scss-to-css'],function(){
+
+    gulp.watch('src/views/*.pug', ['compile-pug-to-html']);
     gulp.watch('src/*.html', browserSync.reload);
+    gulp.watch('src/stylesheets/scss/*', ['compile-scss-to-css']);
     gulp.watch('src/js/**/*.js', browserSync.reload);
 });
 
@@ -24,7 +27,15 @@ gulp.task('browserSync', function(){
     })
 });
 
-gulp.task('sass', function(){
+gulp.task('compile-pug-to-html', function buildHTML() {
+    return gulp.src('src/views/**/*.pug')
+        .pipe(pug({
+            pretty: true
+        }))
+        .pipe(gulp.dest('src'))
+});
+
+gulp.task('compile-scss-to-css', function(){
     return gulp.src('src/stylesheets/scss/**/*.scss')
         .pipe(sass())
         .pipe(gulp.dest('src/stylesheets/css'))
@@ -33,7 +44,7 @@ gulp.task('sass', function(){
         }));
 });
 
-gulp.task('useref', function(){
+gulp.task('optimize-files', function(){
     return gulp.src('src/*.html')
         .pipe(useref())
         .pipe(gulpIf('*.css', cssnano()))
@@ -41,7 +52,7 @@ gulp.task('useref', function(){
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('fonts', function() {
+gulp.task('copy-fonts-to-dist', function() {
     return gulp.src('src/fonts/**/*')
         .pipe(gulp.dest('dist/fonts'))
 });
@@ -53,15 +64,11 @@ gulp.task('copy-images-to-dist', function() {
 
 gulp.task('clean', function() {
     return del.sync('dist');
-})
-
-gulp.task('clean:dist', function() {
-    return del.sync('dist/**/*');
 });
 
 gulp.task('develop', function(callback) {
     runSequence(
-        ['sass', 'browserSync'],
+        ['compile-pug-to-html','compile-scss-to-css', 'browserSync'],
         'watch',
         callback
     )
@@ -69,9 +76,10 @@ gulp.task('develop', function(callback) {
 
 gulp.task('build', function(callback) {
     runSequence(
-        'clean:dist',
-        'sass',
-        ['useref', 'fonts', 'copy-images-to-dist'],
+        'clean',
+        'compile-pug-to-html',
+        'compile-scss-to-css',
+        ['optimize-files', 'copy-fonts-to-dist', 'copy-images-to-dist'],
         callback
     )
 });
