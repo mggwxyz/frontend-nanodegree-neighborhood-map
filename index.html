@@ -1,142 +1,111 @@
 <!DOCTYPE html>
 <html lang="en-us">
-    <head>
-        <title>Neighborhood Map | Front-End Nanodegree</title>
-
-        <meta charset="utf-8">
-        <meta name="viewport" content="initial-scale=1.0">
-
-        <link href="images/favicon.png" rel="icon" type="image/png">
-
-        <style>
-            html, body {
-                box-sizing: border-box;
-                font-size: 16px;
-                height: 100%;
-                width: 100%;
-                padding: 0;
-                margin: 0;
-                border: 0;
-                background-color: black;
-            }
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-                border: 0;
-            }
-            .loader-container {
-                font-family: "Lucida Console", Monaco, monospace;
-                font-size: 16px;
-                height: 100%;
-                width: 100%;
-                background-color: white;
-                text-align: center;
-                z-index: 999;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .loader {
-                height: 3em;
-                width: 3em;
-                border-top: 0.5em solid #1e77e2;
-                border-bottom: 0.5em solid #f6f6f6;
-                border-right: 0.5em solid #1e77e2;
-                border-left: 0.5em solid #f6f6f6;
-                border-radius: 100%;
-                animation: spin 3s linear 0.5s infinite normal;
-            }
-            .loader-container.hidden {
-                display:none;
-            }
-
-            #page-loader {
-                position: fixed;
-                z-index: 100;
-            }
-
-            #map-loader {
-                background-color: #E9E8E6;
-            }
-            #map-loader > .loader {
-                border-top: 0.5em solid #737373;
-                border-bottom: 0.5em solid #a0a0a0;
-                border-right: 0.5em solid #737373;
-                border-left: 0.5em solid #a0a0a0;
-            }
-
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-
-        </style>
-
-        <link rel="stylesheet" href="stylesheets/css/main.min.css">
-
-    </head>
-    <body>
-
-        <div id="page-loader" class="loader-container">
-            <div class="loader"></div>
+  <head>
+    <title>Neighborhood Map | Front-End Nanodegree</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <link href="images/favicon.png" rel="icon" type="image/png">
+    <style>
+      html, body {
+          box-sizing: border-box;
+          font-size: 16px;
+          height: 100%;
+          width: 100%;
+          padding: 0;
+          margin: 0;
+          border: 0;
+          background-color: black;
+      }
+      * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          border: 0;
+      }
+      .loader-container {
+          font-family: "Lucida Console", Monaco, monospace;
+          font-size: 16px;
+          height: 100%;
+          width: 100%;
+          background-color: white;
+          text-align: center;
+          z-index: 999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .loader {
+          height: 3em;
+          width: 3em;
+          border-top: 0.5em solid #7CB3F5;
+          border-bottom: 0.5em solid #bbd6ff;
+          border-right: 0.5em solid #7CB3F5;
+          border-left: 0.5em solid #bbd6ff;
+          border-radius: 100%;
+          animation: spin 3s linear 0.5s infinite normal;
+      }
+      .loader-container.hidden {
+          display:none;
+      }
+      #page-loader {
+          position: fixed;
+          z-index: 100;
+      }
+      #map-loader {
+          background-color: #E9E8E6;
+      }
+      #map-loader > .loader {
+          border-top: 0.5em solid #737373;
+          border-bottom: 0.5em solid #a0a0a0;
+          border-right: 0.5em solid #737373;
+          border-left: 0.5em solid #a0a0a0;
+      }
+      @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+      }
+      
+    </style>
+    <!-- External Stylesheets-->
+    <link rel="stylesheet" href="stylesheets/css/main.min.css">
+  </head>
+  <body>
+    <div class="loader-container" id="page-loader">
+      <div class="loader"></div>
+    </div>
+    <section class="menu" id="menu">
+      <header><a href="https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map"><img class="github-icon" id="github-icon" src="images/github-icon.svg" alt="github icon"></a>
+        <h1>Neighborhood Map</h1><a href="" data-bind="click: toggleMenu"><img class="map-icon" id="map-icon" src="images/map-icon.svg" title="Close Map Menu" alt="Close Map Menu"></a>
+      </header>
+      <div id="input-pane">
+        <div class="input-container">
+          <label for="search">Search</label>
+          <input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="value: searchText, valueUpdate: 'keyup'">
         </div>
-
-        <!-- Menu -->
-        <section id="menu" class="menu">
-            <header>
-                <a href="https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map">
-                    <img id="github-icon" class="github-icon" src="images/github-icon.svg" alt="github icon">
-                </a>
-                <h1>Neighborhood Map</h1>
-                <a href="" data-bind="click: toggleMenu">
-                    <img id="map-icon" class="map-icon" src="images/map-icon.svg" title="Close Map Menu" alt="Close Map Menu">
-                </a>
-            </header>
-            <div id="input-pane">
-                <div class="input-container">
-                    <label for="search">Search</label>
-                    <input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="value: searchText, valueUpdate: 'keyup'">
-                </div>
-                <div class="input-container">
-                    <label for="filter">Filter</label>
-                    <input id="filter" name="filter" type="text" placeholder="Type here to filter out places..." data-bind="value: filterText, valueUpdate: 'keyup'">
-                </div>
-            </div>
-            <div id="places-pane" class="is-loading">
-                <div id="places-loader" class="loader-container">
-                    <div class="loader"></div>
-                </div>
-                <ul data-bind="{ foreach: places, css: { hidden: loadingPlaces } }" class="hidden" >
-                    <!-- ko if: show -->
-                    <li>
-                        <a data-bind="click: $parent.getYelpInfo" href="">
-                            <div class="place-name" data-bind="text: name"></div>
-                        </a>
-                    </li>
-                    <!-- /ko -->
-                </ul>
-                <!-- /ko -->
-            </div>
-        </section>
-
-        <!-- Map -->
-        <main id="map" class="map map-close">
-            <div id="map-loader" class="map loader-container">
-                <div class="loader"></div>
-            </div>
-        </main>
-
-        <!-- Open Menu Icon -->
-        <img id="menu-icon" data-bind="click: toggleMenu" class="menu-icon" src="images/hamburger.svg" title="Open Map Menu" alt="Open Map Menu">
-
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-        <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
-
-        <!-- Javascript -->
-        <script src="js/main.min.js"></script>
-
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&callback=initMap&libraries=places,visualization" async defer onerror="handleError()"></script>
-
-    </body>
+        <div class="input-container">
+          <label for="filter">Filter</label>
+          <input id="filter" name="filter" type="text" placeholder="Type here to filter out places..." data-bind="value: filterText, valueUpdate: 'keyup'">
+        </div>
+      </div>
+      <div class="is-loading" id="places-pane">
+        <div class="loader-container" id="places-loader">
+          <div class="loader"></div>
+        </div>
+        <ul class="hidden" data-bind="{ foreach: places, css: { hidden: loadingPlaces } }">
+          <li><a data-bind="click: $parent.getYelpInfo" href="">
+              <div class="place-name" data-bind="text: name"></div></a></li>
+        </ul>
+      </div>
+    </section>
+    <main class="map map-close" id="map">
+      <div class="map loader-container" id="map-loader">
+        <div class="loader"></div>
+      </div>
+    </main><img class="menu-icon" id="menu-icon" data-bind="click: toggleMenu" src="images/hamburger.svg" title="Open Map Menu" alt="Open Map Menu">
+    <!-- Javascript Dependencies-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
+    <script src="js/main.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&amp;callback=initMap&amp;libraries=places,visualization" async="" defer="" onerror="handleError()"></script>
+  </body>
 </html>
