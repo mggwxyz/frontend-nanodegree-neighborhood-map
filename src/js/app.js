@@ -2,112 +2,18 @@
 /*global window: false */
 
 // Global variables
-var google, map, userPosition, infoWindow,
+var google, map, userPosition, infoWindow, placesService,
     LAT = 38.9072,
     LNG = -77.0369;
 
-// Hard-Coded Destinations
-var defaultPlaces = [{
-    id: 'national-gallery-of-art-washington',
-    name: 'National Gallery of Art',
-    location: {
-        coordinate : {
-            latitude: 38.8913416579172,
-            longitude: -77.0198351875512
-        }
-    }
-}, {
-    id: 'hirshhorn-museum-and-sculpture-garden-washington-2',
-    name: 'Hirshhorn Museum & Sculpture Garden',
-    location: {
-        coordinate : {
-            latitude: 38.8875699,
-            longitude: -77.02191
-        }
-    }
-}, {
-    id: 'bloombars-washington',
-    name: 'BloomBars',
-    location: {
-        coordinate : {
-            latitude: 38.930202,
-            longitude: -77.028114
-        }
-    }
-}, {
-    id: 'freer-gallery-of-art-and-arthur-m-sackler-gallery-washington',
-    name: 'Freer Gallery of Art and Arthur M Sackler Gallery',
-    location: {
-        coordinate : {
-            latitude: 38.8875252753496,
-            longitude: -77.0265506207943
-        }
-    }
-}, {
-    id: 'the-fridge-washington',
-    name: 'The Fridge',
-    location: {
-        coordinate : {
-            latitude: 38.88213,
-            longitude: -76.994232
-        }
-    }
-}, {
-    id: 'national-gallery-of-art-sculpture-garden-washington-2',
-    name: 'National Gallery of Art Sculpture Garden',
-    location: {
-        coordinate : {
-            latitude: 38.8912975692515,
-            longitude: -77.022959356414
-        }
-    }
-}, {
-    id: 'toro-mata-washington',
-    name: 'Toro Mata',
-    location: {
-        coordinate : {
-            latitude: 38.92099,
-            longitude: -77.04238
-        }
-    }
-}, {
-    id: 'the-smithsonian-institution-washington',
-    name: 'The Smithsonian Institution',
-    location: {
-        coordinate : {
-            latitude: 38.8889236,
-            longitude: -77.0261612
-        }
-    }
-}, {
-    id: 'artists-proof-washington-2',
-    name: 'Artist\'s Proof',
-    location: {
-        coordinate : {
-            latitude: 38.910091,
-            longitude: -77.064407
-        }
-    }
-}, {
-    id: 'the-phillips-collection-washington-3',
-    name: 'The Phillips Collection',
-    location: {
-        coordinate : {
-            latitude: 38.911477119043,
-            longitude: -77.0468060633715
-        }
-    }
-}];
-
 // Knockout ViewModel
-function ViewModel(searchText, useDefaultPlaces ) {
+function ViewModel(searchText ) {
     'use strict';
 
     //Initialize local variables for ViewModel
     var self = this; // Variable self refers to ViewModel to clear up 'this' confusion
-    var yelpHelper = new YelpHelper(); // Object is used for ajax calls to Yelp API
+    var placesHelper = new PlacesHelper(); // Object is used for calls to Google Places API
     var initialized = false; // Variable to tell if the map has initialized or not
-    var dflt = useDefaultPlaces; // Variable indicating whether to use default places
 
     // Initialize Knockout observables
     self.searchText = ko.observable(searchText); // Observable for search input text
@@ -115,20 +21,20 @@ function ViewModel(searchText, useDefaultPlaces ) {
     self.places = ko.observableArray([]); // Obserable Array for all places in list
     self.loadingPlaces = ko.observable(true);
 
-    // KO computed observable that watches changes to the search observable and qeuries yelp for relevant places
+    // KO computed observable that watches changes to the search observable and queries Google Places for relevant places
     self.search = ko.computed(function() {
         // Only search if search text is not empty
         if (self.searchText().trim() !== '') {
             // Only
-            if(self.searchText().trim() === 'art gallery' && dflt && !initialized ){
-                var i;
-                for(i = 0; i < defaultPlaces.length ; i++){
-                    addPlace(defaultPlaces[i]);
-                }
-                initialized = true;
-            } else {
-                yelpHelper.getYelpPlaces(self.searchText().trim());
-            }
+            // if(self.searchText().trim() === 'art gallery' && !initialized ){
+            //     var i;
+            //     for(i = 0; i < defaultPlaces.length ; i++){
+            //         addPlace(defaultPlaces[i]);
+            //     }
+            //     initialized = true;
+            // } else {
+                placesHelper.getPlaces(self.searchText().trim());
+            // }
         // Otherwise clear out the list if there is no search text
         } else {
             self.clearPlaces();
@@ -180,7 +86,7 @@ function ViewModel(searchText, useDefaultPlaces ) {
         setTimeout(function() {
             marker.setAnimation(null);
         }, 700);
-        yelpHelper.getYelpPlace(place.id, marker);
+        placesHelper.getPlaceDetails(place, marker);
     }
 
     // Function that clears out places array
@@ -194,7 +100,8 @@ function ViewModel(searchText, useDefaultPlaces ) {
     };
 
     // Function that that will open a place's marker when clicked in list view
-    self.getYelpInfo = function(place){
+    self.getPlaceInfo = function(place){
+        console.log(place);
         // Close the menu if the screen is small
         if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
             changeMenuState(place.marker.getPosition());
@@ -227,127 +134,119 @@ function ViewModel(searchText, useDefaultPlaces ) {
         }, 500);
     }
 
-    // Function to hold all yelp api relatated functions
-    function YelpHelper(){
-
-        // Local Variables Need for API Calls
-        var xhr;
-        var YELP_KEY = 'pV7R7vzUXJEFfl3Dj4retQ',
-            YELP_TOKEN = 'VDFoUxGRIq2274OdKt8U-wwvpgnkKtrL',
-            YELP_KEY_SECRET = 't4CQ3YyzkgP26-lDGp1pVoLOFks',
-            YELP_TOKEN_SECRET = 'SB5H01fW3LCNi3qyO7uaJ59DK9U';
-
-        // Generates random string
-        function nonce_generate() {
-            return (Math.floor(Math.random() * 1e12).toString());
-        }
+    // Function to hold all Google Places API related functions
+    function PlacesHelper(){
 
         // Function for getting additional information about place selected
-        function getYelpPlace(placeId, marker) {
-            // Declare local variables
-            var yelp_url = 'https://api.yelp.com/v2/business/' + placeId;  // Yelp business search url
-            // Parameters required for oauth yelp api request
-            var parameters = {
-                oauth_consumer_key: YELP_KEY,
-                oauth_token: YELP_TOKEN,
-                oauth_nonce: nonce_generate(),
-                oauth_timestamp: Math.floor(Date.now() / 1000),
-                oauth_signature_method: 'HMAC-SHA1',
-                oauth_version: '1.0',
-                callback: 'cb',
-            };
-            // Add encoded oauth signature to ajax parameters
-            var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
-            parameters.oauth_signature = encodedSignature;
-
+       async function getPlaceDetails(place, marker) {
+            console.log(place);
             // Open infoWindow for marker and pan map to the marker
             infoWindow.open(map, marker);
-            infoWindow.setContent('Loading Yelp Data...');
+            infoWindow.setContent('Loading Place Details...');
             map.panTo(marker.getPosition());
 
-            // Send AJAX query via jQuery library.
-            $.ajax({
-                url: yelp_url,
-                data: parameters,
-                cache: true,
-                dataType: 'jsonp'
-            }).done(function(result) { // Success callback
-                // Set infoWindow content for marker that was click to display yelp info
-                var content = '<div class="place-container"><div class="place-image">' +
-                    (result.image_url !== undefined ? '<img src="' + result.image_url + '"/>' : '<div>No image available</div>') +
-                    '</div><div class="place-info">' +
-                    '<p><strong>Name:</strong> ' + (result.name !== undefined ? result.name : 'N/A') + '</p>' +
-                    '<p><strong>Phone:</strong> ' + (result.display_phone !== undefined ? result.display_phone : 'N/A') + '</p>' +
-                    '<p><strong>Rating:</strong> ' + (result.rating !== undefined ? result.rating : 'N/A') + '</p>' +
-                    (result.url !== undefined ? '<p><a href="' + result.url + '">Find Out More</a></p>': '') +
-                    '</div></div>';
-                infoWindow.setContent(content);
-            }).fail(function(jqXHR, textStatus){ // Error callback
-                // Handle error and indicate in infoWindow that an error occurred loading the data
-                handleError();
-                infoWindow.setContent('Error loading data.');
+            var request = {
+                fields: ['displayName', 'nationalPhoneNumber', 'rating', 'websiteURI', 'photos', 'location']
+            };
+
+            const currentPlace = new placesService({
+                id: place.place_id,
+                requestedLanguage: 'en', // optional
             });
+
+
+            try {
+                const {place} = await currentPlace.fetchFields(request);
+
+                const placeDetails = place.Dg;
+                console.log({placeDetails});
+
+                    var photoUrl = '';
+                    if (placeDetails.photos && placeDetails.photos.length > 0) {
+                        photoUrl = `https://places.googleapis.com/v1/${placeDetails.photos[0].name}/media/?maxWidthPx=200&maxHeightPx=200&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`;
+                    }
+                    
+                    var content = '<div class="place-container"><div class="place-image">' +
+                        (photoUrl ? '<img src="' + photoUrl + '"/>' : '<div>No image available</div>') +
+                        '</div><div class="place-info">' +
+                        '<p><strong>Name:</strong> ' + (placeDetails.displayName || 'N/A') + '</p>' +
+                        '<p><strong>Phone:</strong> ' + (placeDetails.nationalPhoneNumber || 'N/A') + '</p>' +
+                        '<p><strong>Rating:</strong> ' + (placeDetails.rating || 'N/A') + '</p>' +
+                        (placeDetails.websiteURI ? '<p><a href="' + placeDetails.websiteURI + '">Find Out More</a></p>': '') +
+                        '</div></div>';
+                    infoWindow.setContent(content);
+                
+            } catch (error) {
+                handleError('Places service failed: ' + error);
+
+                infoWindow.setContent('Error loading place details.');
+
+            }
         }
 
-        // Function for getting the list of yelp results based on search term
-        function getYelpPlaces(term) {
-            // Check to see if the current ajax request is in progress. If it is, abort
-            if(xhr && xhr.readyState != 4){
-                xhr.abort();
-            }
+        // Function for getting the list of places results based on search term
+        async function getPlaces(term) {
             self.loadingPlaces(true);
 
-            // Declare local variables
-            var center = map.getCenter(); // Get map center to pass coordinates to query
-            var yelp_url = 'https://api.yelp.com/v2/search'; // Yelp general search url
-            var parameters = { // Parameter required for oauth yelp api request
-                oauth_consumer_key: YELP_KEY,
-                oauth_token: YELP_TOKEN,
-                oauth_nonce: nonce_generate(),
-                oauth_timestamp: Math.floor(Date.now() / 1000),
-                oauth_signature_method: 'HMAC-SHA1',
-                oauth_version: '1.0',
-                callback: 'cb',
-                limit: 10,
-                term: term,
-                ll: center.lat() + ',' + center.lng()
+            var request = {
+                locationRestriction: map.getBounds(),
+                textQuery: term,
+                fields: ['displayName', 'nationalPhoneNumber', 'rating', 'websiteURI', 'photos', 'location'],
+                language: 'en-US',
+                maxResultCount: 8,
+                minRating: 3.2,
+                region: 'us'
             };
-            // Add encoded oauth signature to ajax parameters
-            var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, YELP_KEY_SECRET, YELP_TOKEN_SECRET);
-            parameters.oauth_signature = encodedSignature;
-            // Send AJAX query via jQuery library
-            xhr = $.ajax({
-                url: yelp_url,
-                data: parameters,
-                cache: true,
-                dataType: 'jsonp'
-            }).done(function(result) { // Successful callback
-                document.getElementById("places-loader").className += ' hidden';
-                self.loadingPlaces(false);
 
-                // If successful, clear out places array and add new places into it
+            try {
+                const {places} = await placesService.searchByText(request);
+
+                console.log({places});
+
+                // Clear out places array and add new places into it
                 self.clearPlaces();
-                result.businesses.forEach(function(place){
-                    addPlace(place);
+                    
+                // Limit to 10 results to match previous behavior
+                var limitedResults = places.slice(0, 10).map(p => p.Dg);
+                
+                limitedResults.forEach(function(place){
+                    console.log(place);
+                    // Convert Google Places format to match expected format
+                    var convertedPlace = {
+                        id: place.id,
+                        place_id: place.id,
+                        name: place.displayName,
+                        location: {
+                            coordinate: {
+                                latitude: place.location.lat,
+                                longitude: place.location.lng
+                            }
+                        }
+                    };
+                    addPlace(convertedPlace);
                 });
-            }).fail(function(jqXHR, textStatus) { // Error callback
-                // Handle error, but ignore aborted requests, because we most likely aborted that request
-                if(textStatus !== 'abort'){
-                    handleError();
-                }
-            });
+            } catch (error) {
+                handleError('Places search failed: ' + error);
+            } finally {
+                document.getElementById("places-loader").className += ' hidden';
+
+                self.loadingPlaces(false);
+            }
         }
 
         return {
-            getYelpPlace : getYelpPlace,
-            getYelpPlaces : getYelpPlaces
+            getPlaceDetails : getPlaceDetails,
+            getPlaces : getPlaces
         };
     }
 }
 
-//Init Map Callback once Google Maps API is downloaded
-var initMap = function() {
+// //Init Map Callback once Google Maps API is downloaded
+var initMap = async function() {
     'use strict';
+
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+    const {Place} = await google.maps.importLibrary("places");
 
     // Attempt to get users geolocation
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
@@ -356,7 +255,7 @@ var initMap = function() {
     function geoSuccess(position) {
         //Initialize the map using the users location
         userPosition = position;
-        map = new google.maps.Map(document.getElementById('map'), {
+        map = new Map(document.getElementById('map'), {
             center: {
                 lat: userPosition.coords.latitude,
                 lng: userPosition.coords.longitude
@@ -364,10 +263,11 @@ var initMap = function() {
             zoom: 12,
             mapTypeControl: false
         });
-        infoWindow = new google.maps.InfoWindow();
+        infoWindow = new InfoWindow();
+        placesService = Place
 
         //Applying the bindings to the view model
-        ko.applyBindings(new ViewModel('art gallery', false));
+        ko.applyBindings(new ViewModel('art gallery'));
 
         var mapLoader = document.getElementById("map-loader");
         if ( mapLoader !== null ) {
@@ -379,7 +279,7 @@ var initMap = function() {
     function geoError(error) {
         // Initialize the map using default location and places
         alert('Showing search results for "art gallery" near default location of Washington DC because we could not access geolocation data');
-        map = new google.maps.Map(document.getElementById('map'), {
+        map = new Map(document.getElementById('map'), {
             center: {
                 lat: LAT,
                 lng: LNG
@@ -393,10 +293,11 @@ var initMap = function() {
                 longitude: LNG
             }
         };
-        infoWindow = new google.maps.InfoWindow();
+        infoWindow = new InfoWindow();
+        placesService = new google.maps.places.PlacesService(map);
 
         //Applying the bindings to the view model
-        ko.applyBindings(new ViewModel('art gallery', true));
+        ko.applyBindings(new ViewModel('art gallery'));
 
         var mapLoader = document.getElementById("map-loader");
         if ( mapLoader !== null ) {
@@ -405,6 +306,8 @@ var initMap = function() {
     }
 
 };
+
+initMap();
 
 // Error handler function which alerts user an error has occurred
 var handleError = function(error){
