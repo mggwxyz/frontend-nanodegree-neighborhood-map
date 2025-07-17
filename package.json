@@ -4,10 +4,10 @@
   "description": "A neighborhood map application for Udacity's Front-End Web Developer Nanodegree",
   "main": "./js/app.js",
   "scripts": {
-    "start": "gulp build && cd dist && http-server -p 8080 -o",
-    "dev": "gulp develop",
-    "demo": "gulp build && cd dist && http-server -p 8080 -o",
-    "deploy": "gulp build && gh-pages -d dist"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -23,19 +23,14 @@
     "oauth-signature": "^1.3.1"
   },
   "devDependencies": {
-    "browser-sync": "^2.17.3",
-    "del": "^2.0.2",
-    "gh-pages": "^0.12.0",
-    "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^3.1.1",
-    "gulp-cache": "^0.4.6",
-    "gulp-cssnano": "^2.1.2",
-    "gulp-if": "^2.0.2",
-    "gulp-pug": "^3.3.0",
-    "gulp-sass": "^2.3.2",
-    "gulp-uglify": "^2.1.2",
-    "gulp-useref": "^3.1.2",
-    "http-server": "^0.9.0",
-    "run-sequence": "^1.2.2"
+    "@vitejs/plugin-legacy": "^5.4.1",
+    "gh-pages": "^6.1.1",
+    "sass": "^1.77.6",
+    "terser": "^5.31.1",
+    "vite": "^5.3.3",
+    "vite-plugin-pug": "^0.3.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }
