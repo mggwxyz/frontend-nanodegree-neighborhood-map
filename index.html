@@ -2,89 +2,158 @@
 <html lang="en-us">
   <head>
     <title>Neighborhood Map | Front-End Nanodegree</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1.0">
-    <link href="images/favicon.png" rel="icon" type="image/png">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0" />
+    <link href="/assets/favicon-DhyY2SUh.png" rel="icon" type="image/png" />
     <style>
-      html, body {
-          box-sizing: border-box;
-          font-size: 16px;
-          height: 100%;
-          width: 100%;
-          padding: 0;
-          margin: 0;
-          border: 0;
-          background-color: black;
+      html,
+      body {
+        box-sizing: border-box;
+        font-size: 16px;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        background-color: black;
       }
       * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-          border: 0;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 0;
       }
       .loader-container {
-          font-family: "Lucida Console", Monaco, monospace;
-          font-size: 16px;
-          height: 100%;
-          width: 100%;
-          background-color: white;
-          text-align: center;
-          z-index: 999;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        font-family: 'Lucida Console', Monaco, monospace;
+        font-size: 16px;
+        height: 100%;
+        width: 100%;
+        background-color: white;
+        text-align: center;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       .loader {
-          height: 3em;
-          width: 3em;
-          border-top: 0.5em solid #7CB3F5;
-          border-bottom: 0.5em solid #bbd6ff;
-          border-right: 0.5em solid #7CB3F5;
-          border-left: 0.5em solid #bbd6ff;
-          border-radius: 100%;
-          animation: spin 3s linear 0.5s infinite normal;
+        height: 3em;
+        width: 3em;
+        border-top: 0.5em solid #7cb3f5;
+        border-bottom: 0.5em solid #bbd6ff;
+        border-right: 0.5em solid #7cb3f5;
+        border-left: 0.5em solid #bbd6ff;
+        border-radius: 100%;
+        animation: spin 3s linear 0.5s infinite normal;
       }
       .loader-container.hidden {
-          display:none;
+        display: none;
       }
       #page-loader {
-          position: fixed;
-          z-index: 100;
+        position: fixed;
+        z-index: 100;
       }
       #map-loader {
-          background-color: #E9E8E6;
+        background-color: #e9e8e6;
       }
       #map-loader > .loader {
-          border-top: 0.5em solid #737373;
-          border-bottom: 0.5em solid #a0a0a0;
-          border-right: 0.5em solid #737373;
-          border-left: 0.5em solid #a0a0a0;
+        border-top: 0.5em solid #737373;
+        border-bottom: 0.5em solid #a0a0a0;
+        border-right: 0.5em solid #737373;
+        border-left: 0.5em solid #a0a0a0;
       }
       @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
       }
-      
     </style>
-    <!-- External Stylesheets-->
-    <link rel="stylesheet" href="stylesheets/css/main.min.css">
+
+
+    <script>
+      (g => {
+        var h,
+          a,
+          k,
+          p = 'The Google Maps JavaScript API',
+          c = 'google',
+          l = 'importLibrary',
+          q = '__ib__',
+          m = document,
+          b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+          r = new Set(),
+          e = new URLSearchParams(),
+          u = () =>
+            h ||
+            (h = new Promise(async (f, n) => {
+              await (a = m.createElement('script'));
+              e.set('libraries', [...r] + '');
+              for (k in g)
+                e.set(
+                  k.replace(/[A-Z]/g, t => '_' + t[0].toLowerCase()),
+                  g[k]
+                );
+              e.set('callback', c + '.maps.' + q);
+              a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+              d[q] = f;
+              a.onerror = () => (h = n(Error(p + ' could not load.')));
+              a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+              m.head.append(a);
+            }));
+        d[l]
+          ? console.warn(p + ' only loads once. Ignoring:', g)
+          : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+      })({
+        key: 'AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I',
+        v: 'weekly',
+        libraries: 'places,visualization'
+      });
+    </script>
+    <link rel="stylesheet" crossorigin href="/assets/main-B7IGEccO.css">
   </head>
   <body>
     <div class="loader-container" id="page-loader">
       <div class="loader"></div>
     </div>
     <section class="menu" id="menu">
-      <header><a href="https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map"><img class="github-icon" id="github-icon" src="images/github-icon.svg" alt="github icon"></a>
-        <h1>Neighborhood Map</h1><a href="" data-bind="click: toggleMenu"><img class="map-icon" id="map-icon" src="images/map-icon.svg" title="Close Map Menu" alt="Close Map Menu"></a>
+      <header>
+        <a href="https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map"
+          ><img class="github-icon" id="github-icon" src="data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='iso-8859-1'?%3e%3c!--%20Generator:%20Adobe%20Illustrator%2016.0.0,%20SVG%20Export%20Plug-In%20.%20SVG%20Version:%206.00%20Build%200)%20--%3e%3c!DOCTYPE%20svg%20PUBLIC%20'-//W3C//DTD%20SVG%201.1//EN'%20'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3e%3csvg%20version='1.1'%20id='Capa_1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20x='0px'%20y='0px'%20width='438.549px'%20height='438.549px'%20viewBox='0%200%20438.549%20438.549'%20style='enable-background:new%200%200%20438.549%20438.549;'%20xml:space='preserve'%3e%3cg%20fill='%23ffffff'%3e%3cpath%20d='M409.132,114.573c-19.608-33.596-46.205-60.194-79.798-79.8C295.736,15.166,259.057,5.365,219.271,5.365%20c-39.781,0-76.472,9.804-110.063,29.408c-33.596,19.605-60.192,46.204-79.8,79.8C9.803,148.168,0,184.854,0,224.63%20c0,47.78,13.94,90.745,41.827,128.906c27.884,38.164,63.906,64.572,108.063,79.227c5.14,0.954,8.945,0.283,11.419-1.996%20c2.475-2.282,3.711-5.14,3.711-8.562c0-0.571-0.049-5.708-0.144-15.417c-0.098-9.709-0.144-18.179-0.144-25.406l-6.567,1.136%20c-4.187,0.767-9.469,1.092-15.846,1c-6.374-0.089-12.991-0.757-19.842-1.999c-6.854-1.231-13.229-4.086-19.13-8.559%20c-5.898-4.473-10.085-10.328-12.56-17.556l-2.855-6.57c-1.903-4.374-4.899-9.233-8.992-14.559%20c-4.093-5.331-8.232-8.945-12.419-10.848l-1.999-1.431c-1.332-0.951-2.568-2.098-3.711-3.429c-1.142-1.331-1.997-2.663-2.568-3.997%20c-0.572-1.335-0.098-2.43,1.427-3.289c1.525-0.859,4.281-1.276,8.28-1.276l5.708,0.853c3.807,0.763,8.516,3.042,14.133,6.851%20c5.614,3.806,10.229,8.754,13.846,14.842c4.38,7.806,9.657,13.754,15.846,17.847c6.184,4.093,12.419,6.136,18.699,6.136%20c6.28,0,11.704-0.476,16.274-1.423c4.565-0.952,8.848-2.383,12.847-4.285c1.713-12.758,6.377-22.559,13.988-29.41%20c-10.848-1.14-20.601-2.857-29.264-5.14c-8.658-2.286-17.605-5.996-26.835-11.14c-9.235-5.137-16.896-11.516-22.985-19.126%20c-6.09-7.614-11.088-17.61-14.987-29.979c-3.901-12.374-5.852-26.648-5.852-42.826c0-23.035,7.52-42.637,22.557-58.817%20c-7.044-17.318-6.379-36.732,1.997-58.24c5.52-1.715,13.706-0.428,24.554,3.853c10.85,4.283,18.794,7.952,23.84,10.994%20c5.046,3.041,9.089,5.618,12.135,7.708c17.705-4.947,35.976-7.421,54.818-7.421s37.117,2.474,54.823,7.421l10.849-6.849%20c7.419-4.57,16.18-8.758,26.262-12.565c10.088-3.805,17.802-4.853,23.134-3.138c8.562,21.509,9.325,40.922,2.279,58.24%20c15.036,16.18,22.559,35.787,22.559,58.817c0,16.178-1.958,30.497-5.853,42.966c-3.9,12.471-8.941,22.457-15.125,29.979%20c-6.191,7.521-13.901,13.85-23.131,18.986c-9.232,5.14-18.182,8.85-26.84,11.136c-8.662,2.286-18.415,4.004-29.263,5.146%20c9.894,8.562,14.842,22.077,14.842,40.539v60.237c0,3.422,1.19,6.279,3.572,8.562c2.379,2.279,6.136,2.95,11.276,1.995%20c44.163-14.653,80.185-41.062,108.068-79.226c27.88-38.161,41.825-81.126,41.825-128.906%20C438.536,184.851,428.728,148.168,409.132,114.573z'/%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3c/svg%3e" alt="github icon"
+        /></a>
+        <h1>Neighborhood Map</h1>
+        <a href="" data-bind="click: toggleMenu"
+          ><img
+            class="map-icon"
+            id="map-icon"
+            src="data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='utf-8'?%3e%3c!DOCTYPE%20svg%20PUBLIC%20'-//W3C//DTD%20SVG%201.1//EN'%20'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3e%3csvg%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20enable-background='new%200%200%20512%20512'%3e%3cg%3e%3cg%20fill='%23ffffff'%3e%3cpath%20d='m313.9,376.7c41.3-68.5%2093.5-164.8%2093.5-214.3%200-83.5-67.9-151.4-151.4-151.4-83.5,0-151.4,67.9-151.4,151.4%200,49.5%2052.2,145.8%2093.5,214.3-49,3.7-160.5,17-160.5,61.1%200,43.4%20113.2,63.2%20218.5,63.2%20105.2,0%20218.5-19.8%20218.5-63.2-0.1-44.1-111.7-57.4-160.7-61.1zm-188.4-214.3c0-72%2058.6-130.6%20130.5-130.6%2072,0%20130.6,58.6%20130.6,130.6%200,62.9-100.2,220.7-130.6,267.1-30.4-46.4-130.5-204.2-130.5-267.1zm130.5,317.7c-127.9,0-197.6-28-197.6-42.4%200-11.1%2046-35%20152-41.1%2019.9,32.1%2035,54.8%2037,57.5%202.7,3.6%2010.6,7.9%2017.3,0%202.1-2.5%2017.1-25.4%2037-57.5%20106,6.1%20152,29.9%20152,41.1-0.1,14.5-69.8,42.4-197.7,42.4z'/%3e%3cpath%20d='m321.9,162.4c0-36.4-29.5-65.9-65.9-65.9-36.4,0-65.9,29.5-65.9,65.9%200,36.4%2029.5,65.9%2065.9,65.9%2036.4,0%2065.9-29.5%2065.9-65.9zm-111,0c0-24.9%2020.2-45.1%2045.1-45.1s45.1,20.2%2045.1,45.1c0,24.9-20.2,45.1-45.1,45.1s-45.1-20.2-45.1-45.1z'/%3e%3c/g%3e%3c/g%3e%3c/svg%3e"
+            title="Close Map Menu"
+            alt="Close Map Menu"
+        /></a>
       </header>
       <div id="input-pane">
         <div class="input-container">
           <label for="search">Search</label>
-          <input id="search" name="search" type="text" placeholder="Type here to search for places..." data-bind="value: searchText, valueUpdate: 'keyup'">
+          <input
+            id="search"
+            name="search"
+            type="text"
+            placeholder="Type here to search for places..."
+            data-bind="value: searchText, valueUpdate: 'keyup'"
+          />
         </div>
         <div class="input-container">
           <label for="filter">Filter</label>
-          <input id="filter" name="filter" type="text" placeholder="Type here to filter out places..." data-bind="value: filterText, valueUpdate: 'keyup'">
+          <input
+            id="filter"
+            name="filter"
+            type="text"
+            placeholder="Type here to filter out places..."
+            data-bind="value: filterText, valueUpdate: 'keyup'"
+          />
         </div>
       </div>
       <div class="is-loading" id="places-pane">
@@ -92,8 +161,11 @@
           <div class="loader"></div>
         </div>
         <ul class="hidden" data-bind="{ foreach: places, css: { hidden: loadingPlaces } }">
-          <li><a data-bind="click: $parent.getYelpInfo" href="">
-              <div class="place-name" data-bind="text: name"></div></a></li>
+          <li data-bind="visible: show">
+            <a data-bind="click: $parent.getPlaceInfo" href="">
+              <div class="place-name" data-bind="text: name"></div
+            ></a>
+          </li>
         </ul>
       </div>
     </section>
@@ -101,11 +173,34 @@
       <div class="map loader-container" id="map-loader">
         <div class="loader"></div>
       </div>
-    </main><img class="menu-icon" id="menu-icon" data-bind="click: toggleMenu" src="images/hamburger.svg" title="Open Map Menu" alt="Open Map Menu">
+    </main>
+
+    <img
+      class="menu-icon"
+      id="menu-icon"
+      data-bind="click: toggleMenu"
+      src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20x='0px'%20y='0px'%20viewBox='0%200%2032%2032'%3e%3crect%20x='0'%20y='3'%20fill='%23ffffff'%20width='32'%20height='5'%20rx='3'%20ry='3'/%3e%3crect%20x='0'%20y='14'%20fill='%23ffffff'%20width='32'%20height='5'%20rx='3'%20ry='3'/%3e%3crect%20x='0'%20y='25'%20fill='%23ffffff'%20width='32'%20height='5'%20rx='3'%20ry='3'/%3e%3c/svg%3e"
+      title="Open Map Menu"
+      alt="Open Map Menu"
+    />
+
+    <gmpx-api-loader
+      key="AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I"
+      solution-channel="GMP_GE_mapsandplacesautocomplete_v2"
+    >
+    </gmpx-api-loader>
+    <gmp-map center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
+      <div slot="control-block-start-inline-start" class="place-picker-container">
+        <gmpx-place-picker placeholder="Enter an address"></gmpx-place-picker>
+      </div>
+      <gmp-advanced-marker></gmp-advanced-marker>
+    </gmp-map>
+
     <!-- Javascript Dependencies-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
-    <script src="js/main.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmHmd5m8E8zJkXRcMPgDK9fYuoXrfYD0A&amp;callback=initMap&amp;libraries=places,visualization" async="" defer="" onerror="handleError()"></script>
+    <!--build:js js/main.min.js-->
+    <script src="js/app.js"></script>
+    <!--endbuild-->
   </body>
 </html>
