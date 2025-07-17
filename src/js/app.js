@@ -1,5 +1,12 @@
 /*jslint browser: true */
 /*global window: false */
+import {Loader} from '@googlemaps/js-api-loader';
+
+const loader = new Loader({
+  apiKey: 'AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I',
+  version: 'weekly',
+  libraries: ['places', 'visualization', 'maps']
+});
 
 // Global variables
 var google,
@@ -7,6 +14,7 @@ var google,
   userPosition,
   infoWindow,
   placesService,
+  markerService,
   LAT = 38.9072,
   LNG = -77.0369;
 
@@ -42,25 +50,57 @@ function ViewModel(searchText) {
    * removes places from list and map base on filter entered
    */
   self.filter = ko.computed(function () {
-    var regex = new RegExp(self.filterText(), 'i');
-    self.places().forEach(function (place) {
-      if (place.name.search(regex) == -1) {
-        // Close open infowindow if the place is being filtered
-        if (infoWindow.getPosition() === place.marker.getPosition()) {
-          infoWindow.close();
-        }
-        place.show(false);
-        place.marker.setVisible(false);
-      } else {
+    var filterText = self.filterText();
+
+    // If filter is empty, show all places
+    if (!filterText || filterText.trim() === '') {
+      self.places().forEach(function (place) {
         place.show(true);
-        place.marker.setVisible(true);
+        if (place.marker && typeof place.marker.setVisible === 'function') {
+          place.marker.setVisible(true);
+        }
+      });
+      return;
+    }
+
+    var regex = new RegExp(filterText, 'i');
+
+    self.places().forEach(function (place) {
+      var shouldShow = place.name.search(regex) !== -1;
+
+      // Update the show observable for the list view
+      place.show(shouldShow);
+
+      // Update marker visibility if Google Maps is loaded and marker exists
+      if (place.marker && typeof place.marker.setVisible === 'function') {
+        place.marker.setVisible(shouldShow);
+
+        // Close infoWindow if the filtered place was being displayed
+        if (
+          !shouldShow &&
+          infoWindow &&
+          typeof infoWindow.getPosition === 'function' &&
+          typeof place.marker.getPosition === 'function'
+        ) {
+          try {
+            if (
+              infoWindow.getPosition() &&
+              place.marker.getPosition() &&
+              infoWindow.getPosition().equals(place.marker.getPosition())
+            ) {
+              infoWindow.close();
+            }
+          } catch (error) {
+            // Silently handle any Google Maps API errors
+          }
+        }
       }
     });
   });
 
   // Function that will add place and marker to the places observable array
   function addPlace(place) {
-    var marker = new google.maps.Marker({
+    var marker = new markerService({
       map: map,
       position: {
         lng: place.location.coordinate.longitude,
@@ -84,10 +124,10 @@ function ViewModel(searchText) {
   // Function that opens animates and opens a Google Maps marker
   function openMarker(place, marker) {
     map.setCenter(marker.getPosition());
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(function () {
-      marker.setAnimation(null);
-    }, 700);
+    // marker.setAnimation(google.maps.Animation.BOUNCE);
+    // setTimeout(function () {
+    //   marker.setAnimation(null);
+    // }, 700);
     placesHelper.getPlaceDetails(place, marker);
   }
 
@@ -256,12 +296,13 @@ function ViewModel(searchText) {
 }
 
 // //Init Map Callback once Google Maps API is downloaded
-var initMap = async function () {
+async function initMap() {
   'use strict';
 
-  const {Map, InfoWindow} = await google.maps.importLibrary('maps');
-  const {Place} = await google.maps.importLibrary('places');
-
+  const {Map, InfoWindow} = await loader.importLibrary('maps');
+  const {Place} = await loader.importLibrary('places');
+  const {Marker} = await loader.importLibrary('marker');
+  markerService = Marker;
   // Attempt to get users geolocation
   navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
@@ -310,7 +351,7 @@ var initMap = async function () {
       }
     };
     infoWindow = new InfoWindow();
-    placesService = new google.maps.places.PlacesService(map);
+    placesService = Place;
 
     //Applying the bindings to the view model
     ko.applyBindings(new ViewModel('art gallery'));
@@ -320,7 +361,7 @@ var initMap = async function () {
       document.getElementById('map-loader').className += ' hidden';
     }
   }
-};
+}
 
 initMap();
 
