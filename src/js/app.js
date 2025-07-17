@@ -2,330 +2,348 @@
 /*global window: false */
 
 // Global variables
-var google, map, userPosition, infoWindow, placesService,
-    LAT = 38.9072,
-    LNG = -77.0369;
+var google,
+  map,
+  userPosition,
+  infoWindow,
+  placesService,
+  LAT = 38.9072,
+  LNG = -77.0369;
 
 // Knockout ViewModel
-function ViewModel(searchText ) {
-    'use strict';
+function ViewModel(searchText) {
+  'use strict';
 
-    //Initialize local variables for ViewModel
-    var self = this; // Variable self refers to ViewModel to clear up 'this' confusion
-    var placesHelper = new PlacesHelper(); // Object is used for calls to Google Places API
-    var initialized = false; // Variable to tell if the map has initialized or not
+  //Initialize local variables for ViewModel
+  var self = this; // Variable self refers to ViewModel to clear up 'this' confusion
+  var placesHelper = new PlacesHelper(); // Object is used for calls to Google Places API
+  var initialized = false; // Variable to tell if the map has initialized or not
 
-    // Initialize Knockout observables
-    self.searchText = ko.observable(searchText); // Observable for search input text
-    self.filterText = ko.observable(''); // Observable for filter input text
-    self.places = ko.observableArray([]); // Obserable Array for all places in list
-    self.loadingPlaces = ko.observable(true);
+  // Initialize Knockout observables
+  self.searchText = ko.observable(searchText); // Observable for search input text
+  self.filterText = ko.observable(''); // Observable for filter input text
+  self.places = ko.observableArray([]); // Obserable Array for all places in list
+  self.loadingPlaces = ko.observable(true);
 
-    // KO computed observable that watches changes to the search observable and queries Google Places for relevant places
-    self.search = ko.computed(function() {
-        // Only search if search text is not empty
-        if (self.searchText().trim() !== '') {
-            // Only
-            // if(self.searchText().trim() === 'art gallery' && !initialized ){
-            //     var i;
-            //     for(i = 0; i < defaultPlaces.length ; i++){
-            //         addPlace(defaultPlaces[i]);
-            //     }
-            //     initialized = true;
-            // } else {
-                placesHelper.getPlaces(self.searchText().trim());
-            // }
-        // Otherwise clear out the list if there is no search text
-        } else {
-            self.clearPlaces();
+  // KO computed observable that watches changes to the search observable and queries Google Places for relevant places
+  self.search = ko.computed(function () {
+    // Only search if search text is not empty
+    if (self.searchText().trim() !== '') {
+      placesHelper.getPlaces(self.searchText().trim());
+
+      // Otherwise clear out the list if there is no search text
+    } else {
+      self.clearPlaces();
+    }
+  });
+
+  /*
+   * KO computed observable that watches changes to the filter observable then
+   * removes places from list and map base on filter entered
+   */
+  self.filter = ko.computed(function () {
+    var regex = new RegExp(self.filterText(), 'i');
+    self.places().forEach(function (place) {
+      if (place.name.search(regex) == -1) {
+        // Close open infowindow if the place is being filtered
+        if (infoWindow.getPosition() === place.marker.getPosition()) {
+          infoWindow.close();
         }
+        place.show(false);
+        place.marker.setVisible(false);
+      } else {
+        place.show(true);
+        place.marker.setVisible(true);
+      }
+    });
+  });
+
+  // Function that will add place and marker to the places observable array
+  function addPlace(place) {
+    var marker = new google.maps.Marker({
+      map: map,
+      position: {
+        lng: place.location.coordinate.longitude,
+        lat: place.location.coordinate.latitude
+      },
+      icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
     });
 
-    /*
-     * KO computed observable that watches changes to the filter observable then
-     * removes places from list and map base on filter entered
-     */
-    self.filter = ko.computed(function(){
-        var regex = new RegExp(self.filterText(), 'i');
-        self.places().forEach(function(place) {
-            if (place.name.search(regex) == -1) {
-                // Close open infowindow if the place is being filtered
-                if( infoWindow.getPosition() === place.marker.getPosition()){
-                    infoWindow.close();
-                }
-                place.show(false);
-                place.marker.setVisible(false);
-            } else {
-                place.show(true);
-                place.marker.setVisible(true);
+    marker.addListener(
+      'click',
+      function () {
+        openMarker(place, marker);
+      },
+      false
+    );
+    place.marker = marker;
+    place.show = ko.observable(true);
+    self.places.push(place);
+  }
+
+  // Function that opens animates and opens a Google Maps marker
+  function openMarker(place, marker) {
+    map.setCenter(marker.getPosition());
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function () {
+      marker.setAnimation(null);
+    }, 700);
+    placesHelper.getPlaceDetails(place, marker);
+  }
+
+  // Function that clears out places array
+  self.clearPlaces = function () {
+    var length = self.places().length;
+    for (var i = 0; i < length; i++) {
+      var removedPlace = self.places().shift();
+      removedPlace.marker.setMap(null);
+    }
+    self.places.removeAll();
+  };
+
+  // Function that that will open a place's marker when clicked in list view
+  self.getPlaceInfo = function (place) {
+    // Close the menu if the screen is small
+    if (window.innerWidth < 500 && !$('#menu').hasClass('menu-close')) {
+      changeMenuState(place.marker.getPosition());
+    }
+    // Opens relevant marker
+    openMarker(place, place.marker);
+  };
+
+  // Exposed view model function to call animateMenu
+  self.toggleMenu = function () {
+    var position = {
+      lat: userPosition.coords.latitude,
+      lng: userPosition.coords.longitude
+    };
+    changeMenuState(position);
+  };
+
+  // Animates the menu sidebar to open or close
+  function changeMenuState(position) {
+    var mapDiv = $('#map');
+    var menu = $('#menu');
+    mapDiv.toggleClass('map-close');
+    menu.toggleClass('menu-close');
+    // Resize map and pan back to center
+    setTimeout(function () {
+      var content = infoWindow.getContent();
+      google.maps.event.trigger(map, 'resize');
+      map.panTo(position);
+      infoWindow.setContent(content);
+    }, 500);
+  }
+
+  // Function to hold all Google Places API related functions
+  function PlacesHelper() {
+    // Function for getting additional information about place selected
+    async function getPlaceDetails(place, marker) {
+      // Open infoWindow for marker and pan map to the marker
+      infoWindow.open(map, marker);
+      infoWindow.setContent('Loading Place Details...');
+      map.panTo(marker.getPosition());
+
+      var request = {
+        fields: ['displayName', 'nationalPhoneNumber', 'rating', 'websiteURI', 'photos', 'location']
+      };
+
+      const currentPlace = new placesService({
+        id: place.place_id,
+        requestedLanguage: 'en' // optional
+      });
+
+      try {
+        const {place} = await currentPlace.fetchFields(request);
+
+        const placeDetails = place.Dg;
+
+        var photoUrl = '';
+        if (placeDetails.photos && placeDetails.photos.length > 0) {
+          photoUrl = `https://places.googleapis.com/v1/${placeDetails.photos[0].name}/media/?maxWidthPx=200&maxHeightPx=200&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`;
+        }
+
+        var content = `
+                        <div class="place-container">
+                            <div class="place-image">
+                                ${
+                                  photoUrl
+                                    ? `<img src="${photoUrl}"/>`
+                                    : '<div>No image available</div>'
+                                }
+                            </div>
+                            <div class="place-info">
+                                <p><strong>Name:</strong> ${placeDetails.displayName || 'N/A'}</p>
+                                <p><strong>Phone:</strong> ${
+                                  placeDetails.nationalPhoneNumber || 'N/A'
+                                }</p>
+                                <p><strong>Rating:</strong> ${placeDetails.rating || 'N/A'}</p>
+                                ${
+                                  placeDetails.websiteURI
+                                    ? `<p><a href="${placeDetails.websiteURI}">Find Out More</a></p>`
+                                    : ''
+                                }
+                            </div>
+                        </div>
+                    `;
+        infoWindow.setContent(content);
+      } catch (error) {
+        handleError('Places service failed: ' + error);
+
+        infoWindow.setContent('Error loading place details.');
+      }
+    }
+
+    // Function for getting the list of places results based on search term
+    async function getPlaces(term) {
+      self.loadingPlaces(true);
+
+      var request = {
+        locationRestriction: map.getBounds(),
+        textQuery: term,
+        fields: [
+          'displayName',
+          'nationalPhoneNumber',
+          'rating',
+          'websiteURI',
+          'photos',
+          'location'
+        ],
+        language: 'en-US',
+        maxResultCount: 8,
+        minRating: 3.2,
+        region: 'us'
+      };
+
+      try {
+        const {places} = await placesService.searchByText(request);
+
+        // Clear out places array and add new places into it
+        self.clearPlaces();
+
+        // Limit to 10 results to match previous behavior
+        var limitedResults = places.slice(0, 10).map(p => p.Dg);
+
+        limitedResults.forEach(function (place) {
+          // Convert Google Places format to match expected format
+          var convertedPlace = {
+            id: place.id,
+            place_id: place.id,
+            name: place.displayName,
+            location: {
+              coordinate: {
+                latitude: place.location.lat,
+                longitude: place.location.lng
+              }
             }
+          };
+          addPlace(convertedPlace);
         });
-    });
+      } catch (error) {
+        handleError('Places search failed: ' + error);
+      } finally {
+        document.getElementById('places-loader').className += ' hidden';
 
-    // Function that will add place and marker to the places observable array
-    function addPlace(place){
-        var marker = new google.maps.Marker({
-            map: map,
-            position: {
-                lng: place.location.coordinate.longitude,
-                lat: place.location.coordinate.latitude
-            },
-            icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-        });
-
-        marker.addListener('click', function(){openMarker(place, marker);}, false);
-        place.marker = marker;
-        place.show = ko.observable(true);
-        self.places.push(place);
+        self.loadingPlaces(false);
+      }
     }
 
-    // Function that opens animates and opens a Google Maps marker
-    function openMarker(place, marker) {
-        map.setCenter(marker.getPosition());
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(function() {
-            marker.setAnimation(null);
-        }, 700);
-        placesHelper.getPlaceDetails(place, marker);
-    }
-
-    // Function that clears out places array
-    self.clearPlaces = function(){
-        var length = self.places().length;
-        for(var i = 0; i < length; i++ ){
-            var removedPlace = self.places().shift();
-            removedPlace.marker.setMap(null);
-        }
-        self.places.removeAll();
+    return {
+      getPlaceDetails: getPlaceDetails,
+      getPlaces: getPlaces
     };
-
-    // Function that that will open a place's marker when clicked in list view
-    self.getPlaceInfo = function(place){
-        console.log(place);
-        // Close the menu if the screen is small
-        if(window.innerWidth < 500 && !$('#menu').hasClass('menu-close')){
-            changeMenuState(place.marker.getPosition());
-        }
-        // Opens relevant marker
-        openMarker(place, place.marker);
-    };
-
-    // Exposed view model function to call animateMenu
-    self.toggleMenu = function(){
-        var position = {
-            lat: userPosition.coords.latitude,
-            lng: userPosition.coords.longitude
-        };
-        changeMenuState(position);
-    };
-
-    // Animates the menu sidebar to open or close
-    function changeMenuState(position){
-        var mapDiv = $('#map');
-        var menu = $('#menu');
-        mapDiv.toggleClass('map-close');
-        menu.toggleClass('menu-close');
-        // Resize map and pan back to center
-        setTimeout(function () {
-            var content = infoWindow.getContent();
-            google.maps.event.trigger(map, 'resize');
-            map.panTo(position);
-            infoWindow.setContent(content);
-        }, 500);
-    }
-
-    // Function to hold all Google Places API related functions
-    function PlacesHelper(){
-
-        // Function for getting additional information about place selected
-       async function getPlaceDetails(place, marker) {
-            console.log(place);
-            // Open infoWindow for marker and pan map to the marker
-            infoWindow.open(map, marker);
-            infoWindow.setContent('Loading Place Details...');
-            map.panTo(marker.getPosition());
-
-            var request = {
-                fields: ['displayName', 'nationalPhoneNumber', 'rating', 'websiteURI', 'photos', 'location']
-            };
-
-            const currentPlace = new placesService({
-                id: place.place_id,
-                requestedLanguage: 'en', // optional
-            });
-
-
-            try {
-                const {place} = await currentPlace.fetchFields(request);
-
-                const placeDetails = place.Dg;
-                console.log({placeDetails});
-
-                    var photoUrl = '';
-                    if (placeDetails.photos && placeDetails.photos.length > 0) {
-                        photoUrl = `https://places.googleapis.com/v1/${placeDetails.photos[0].name}/media/?maxWidthPx=200&maxHeightPx=200&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`;
-                    }
-                    
-                    var content = '<div class="place-container"><div class="place-image">' +
-                        (photoUrl ? '<img src="' + photoUrl + '"/>' : '<div>No image available</div>') +
-                        '</div><div class="place-info">' +
-                        '<p><strong>Name:</strong> ' + (placeDetails.displayName || 'N/A') + '</p>' +
-                        '<p><strong>Phone:</strong> ' + (placeDetails.nationalPhoneNumber || 'N/A') + '</p>' +
-                        '<p><strong>Rating:</strong> ' + (placeDetails.rating || 'N/A') + '</p>' +
-                        (placeDetails.websiteURI ? '<p><a href="' + placeDetails.websiteURI + '">Find Out More</a></p>': '') +
-                        '</div></div>';
-                    infoWindow.setContent(content);
-                
-            } catch (error) {
-                handleError('Places service failed: ' + error);
-
-                infoWindow.setContent('Error loading place details.');
-
-            }
-        }
-
-        // Function for getting the list of places results based on search term
-        async function getPlaces(term) {
-            self.loadingPlaces(true);
-
-            var request = {
-                locationRestriction: map.getBounds(),
-                textQuery: term,
-                fields: ['displayName', 'nationalPhoneNumber', 'rating', 'websiteURI', 'photos', 'location'],
-                language: 'en-US',
-                maxResultCount: 8,
-                minRating: 3.2,
-                region: 'us'
-            };
-
-            try {
-                const {places} = await placesService.searchByText(request);
-
-                console.log({places});
-
-                // Clear out places array and add new places into it
-                self.clearPlaces();
-                    
-                // Limit to 10 results to match previous behavior
-                var limitedResults = places.slice(0, 10).map(p => p.Dg);
-                
-                limitedResults.forEach(function(place){
-                    console.log(place);
-                    // Convert Google Places format to match expected format
-                    var convertedPlace = {
-                        id: place.id,
-                        place_id: place.id,
-                        name: place.displayName,
-                        location: {
-                            coordinate: {
-                                latitude: place.location.lat,
-                                longitude: place.location.lng
-                            }
-                        }
-                    };
-                    addPlace(convertedPlace);
-                });
-            } catch (error) {
-                handleError('Places search failed: ' + error);
-            } finally {
-                document.getElementById("places-loader").className += ' hidden';
-
-                self.loadingPlaces(false);
-            }
-        }
-
-        return {
-            getPlaceDetails : getPlaceDetails,
-            getPlaces : getPlaces
-        };
-    }
+  }
 }
 
 // //Init Map Callback once Google Maps API is downloaded
-var initMap = async function() {
-    'use strict';
+var initMap = async function () {
+  'use strict';
 
-    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-    const {Place} = await google.maps.importLibrary("places");
+  const {Map, InfoWindow} = await google.maps.importLibrary('maps');
+  const {Place} = await google.maps.importLibrary('places');
 
-    // Attempt to get users geolocation
-    navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+  // Attempt to get users geolocation
+  navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
-    // Successful callback when the users geolocation information can be accessed
-    function geoSuccess(position) {
-        //Initialize the map using the users location
-        userPosition = position;
-        map = new Map(document.getElementById('map'), {
-            center: {
-                lat: userPosition.coords.latitude,
-                lng: userPosition.coords.longitude
-            },
-            zoom: 12,
-            mapTypeControl: false
-        });
-        infoWindow = new InfoWindow();
-        placesService = Place
+  // Successful callback when the users geolocation information can be accessed
+  function geoSuccess(position) {
+    //Initialize the map using the users location
+    userPosition = position;
+    map = new Map(document.getElementById('map'), {
+      center: {
+        lat: userPosition.coords.latitude,
+        lng: userPosition.coords.longitude
+      },
+      zoom: 12,
+      mapTypeControl: false
+    });
+    infoWindow = new InfoWindow();
+    placesService = Place;
 
-        //Applying the bindings to the view model
-        ko.applyBindings(new ViewModel('art gallery'));
+    //Applying the bindings to the view model
+    ko.applyBindings(new ViewModel('art gallery'));
 
-        var mapLoader = document.getElementById("map-loader");
-        if ( mapLoader !== null ) {
-            document.getElementById("map-loader").className += ' hidden';
-        }
+    var mapLoader = document.getElementById('map-loader');
+    if (mapLoader !== null) {
+      document.getElementById('map-loader').className += ' hidden';
     }
+  }
 
-    // Error callback when user's geolocation cannot be accessed
-    function geoError(error) {
-        // Initialize the map using default location and places
-        alert('Showing search results for "art gallery" near default location of Washington DC because we could not access geolocation data');
-        map = new Map(document.getElementById('map'), {
-            center: {
-                lat: LAT,
-                lng: LNG
-            },
-            zoom: 12,
-            mapTypeControl: false
-        });
-        userPosition = {
-            coords: {
-                latitude: LAT,
-                longitude: LNG
-            }
-        };
-        infoWindow = new InfoWindow();
-        placesService = new google.maps.places.PlacesService(map);
+  // Error callback when user's geolocation cannot be accessed
+  function geoError(error) {
+    // Initialize the map using default location and places
+    alert(
+      'Showing search results for "art gallery" near default location of Washington DC because we could not access geolocation data'
+    );
+    map = new Map(document.getElementById('map'), {
+      center: {
+        lat: LAT,
+        lng: LNG
+      },
+      zoom: 12,
+      mapTypeControl: false
+    });
+    userPosition = {
+      coords: {
+        latitude: LAT,
+        longitude: LNG
+      }
+    };
+    infoWindow = new InfoWindow();
+    placesService = new google.maps.places.PlacesService(map);
 
-        //Applying the bindings to the view model
-        ko.applyBindings(new ViewModel('art gallery'));
+    //Applying the bindings to the view model
+    ko.applyBindings(new ViewModel('art gallery'));
 
-        var mapLoader = document.getElementById("map-loader");
-        if ( mapLoader !== null ) {
-            document.getElementById("map-loader").className += ' hidden';
-        }
+    var mapLoader = document.getElementById('map-loader');
+    if (mapLoader !== null) {
+      document.getElementById('map-loader').className += ' hidden';
     }
-
+  }
 };
 
 initMap();
 
 // Error handler function which alerts user an error has occurred
-var handleError = function(error){
-    console.log('Something has gone wrong. Please try refreshing the page. ',  error);
+var handleError = function (error) {
+  console.error('Something has gone wrong. Please try refreshing the page. ', error);
 };
 
 // Global catch for all errors that may occur but don't get handled
-window.onerror = function(error){
-    handleError(error);
+window.onerror = function (error) {
+  handleError(error);
 };
 
-function removePageLoader(){
-   var pageLoader =  document.getElementById('page-loader');
-   document.body.removeChild(pageLoader);
+function removePageLoader() {
+  var pageLoader = document.getElementById('page-loader');
+  document.body.removeChild(pageLoader);
 }
 
-if ( document.readyState = 'complete' || (document.readyState = 'loading' && !document.documentElement.doScroll )) {
-    removePageLoader();
+if (
+  document.readyState === 'complete' ||
+  (document.readyState === 'loading' && !document.documentElement.doScroll)
+) {
+  removePageLoader();
 } else {
-    document.addEventListener('DOMContentLoaded', removePageLoader );
+  document.addEventListener('DOMContentLoaded', removePageLoader);
 }
