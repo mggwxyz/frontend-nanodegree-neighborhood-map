@@ -3,8 +3,10 @@
 import {Loader} from '@googlemaps/js-api-loader';
 import pWaitFor from 'p-wait-for';
 
+const API_KEY = 'AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I';
+
 const loader = new Loader({
-  apiKey: 'AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I',
+  apiKey: API_KEY,
   version: 'weekly',
   libraries: ['places', 'visualization', 'maps']
 });
@@ -204,8 +206,7 @@ function ViewModel(searchText) {
 
         var photoUrl = '';
         if (placeDetails.photos && placeDetails.photos.length > 0) {
-          console.log(placeDetails.photos[0]);
-          photoUrl = `https://places.googleapis.com/v1/${placeDetails.photos[0].name}/media/?maxWidthPx=200&maxHeightPx=200&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`;
+          photoUrl = `https://places.googleapis.com/v1/${placeDetails.photos[0].name}/media/?maxWidthPx=200&maxHeightPx=200&key=${API_KEY}`;
         }
 
         var content = `
@@ -313,8 +314,6 @@ async function initMap() {
   function geoSuccess(position) {
     //Initialize the map using the users location
     userPosition = position;
-
-    console.log(userPosition);
 
     map = new Map(document.getElementById('map'), {
       center: {
