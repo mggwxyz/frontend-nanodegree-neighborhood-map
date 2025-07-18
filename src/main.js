@@ -144,8 +144,8 @@ function ViewModel(searchText) {
 
   // Function that that will open a place's marker when clicked in list view
   self.getPlaceInfo = function (place) {
-    // Close the menu if the screen is small
-    if (window.innerWidth < 500 && !$('#menu').hasClass('menu-close')) {
+    // Close the menu if the screen is small (but not on mobile layout where menu is always visible)
+    if (window.innerWidth > 500 && window.innerWidth <= 768 && !$('#menu').hasClass('menu-close')) {
       changeMenuState(place.marker.getPosition());
     }
     // Opens relevant marker
@@ -163,10 +163,13 @@ function ViewModel(searchText) {
 
   // Animates the menu sidebar to open or close
   function changeMenuState(position) {
-    var mapDiv = $('#map');
-    var menu = $('#menu');
-    mapDiv.toggleClass('map-close');
-    menu.toggleClass('menu-close');
+    // Don't toggle menu on small screens (768px and below)
+    if (window.innerWidth > 768) {
+      var mapDiv = $('#map');
+      var menu = $('#menu');
+      mapDiv.toggleClass('map-close');
+      menu.toggleClass('menu-close');
+    }
     // Resize map and pan back to center
     setTimeout(function () {
       var content = infoWindow.getContent();
