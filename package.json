@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map#readme",
   "dependencies": {
-    "@googlemaps/js-api-loader": "^1.16.10"
+    "@googlemaps/js-api-loader": "^1.16.10",
+    "p-wait-for": "^5.0.2"
   },
   "devDependencies": {
     "gh-pages": "^6.1.1",

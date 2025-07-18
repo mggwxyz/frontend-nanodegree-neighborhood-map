@@ -1,6 +1,7 @@
 /*jslint browser: true */
 /*global window: false */
 import {Loader} from '@googlemaps/js-api-loader';
+import pWaitFor from 'p-wait-for';
 
 const loader = new Loader({
   apiKey: 'AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I',
@@ -200,32 +201,28 @@ function ViewModel(searchText) {
 
         var photoUrl = '';
         if (placeDetails.photos && placeDetails.photos.length > 0) {
+          console.log(placeDetails.photos[0]);
           photoUrl = `https://places.googleapis.com/v1/${placeDetails.photos[0].name}/media/?maxWidthPx=200&maxHeightPx=200&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`;
         }
 
         var content = `
-                        <div class="place-container">
-                            <div class="place-image">
-                                ${
-                                  photoUrl
-                                    ? `<img src="${photoUrl}"/>`
-                                    : '<div>No image available</div>'
-                                }
-                            </div>
-                            <div class="place-info">
-                                <p><strong>Name:</strong> ${placeDetails.displayName || 'N/A'}</p>
-                                <p><strong>Phone:</strong> ${
-                                  placeDetails.nationalPhoneNumber || 'N/A'
-                                }</p>
-                                <p><strong>Rating:</strong> ${placeDetails.rating || 'N/A'}</p>
-                                ${
-                                  placeDetails.websiteURI
-                                    ? `<p><a href="${placeDetails.websiteURI}">Find Out More</a></p>`
-                                    : ''
-                                }
-                            </div>
-                        </div>
-                    `;
+          <div class="place-container">
+              <div class="place-image">
+                  ${photoUrl ? `<img src="${photoUrl}"/>` : '<div>No image available</div>'}
+              </div>
+              <div class="place-info">
+                  <p><strong>Name:</strong> ${placeDetails.displayName || 'N/A'}</p>
+                  <p><strong>Phone:</strong> ${placeDetails.nationalPhoneNumber || 'N/A'}</p>
+                  <p><strong>Rating:</strong> ${placeDetails.rating || 'N/A'}</p>
+                  ${
+                    placeDetails.websiteURI
+                      ? `<p><a href="${placeDetails.websiteURI}">Find Out More</a></p>`
+                      : ''
+                  }
+              </div>
+          </div>
+        `;
+
         infoWindow.setContent(content);
       } catch (error) {
         handleError('Places service failed: ' + error);
@@ -238,10 +235,7 @@ function ViewModel(searchText) {
     async function getPlaces(term) {
       self.loadingPlaces(true);
 
-      console.log(map);
-
-      console.log(map.getBounds());
-      console.log(map.getCenter());
+      await pWaitFor(() => Boolean(map.getBounds()));
 
       var request = {
         locationRestriction: map.getBounds(),
@@ -306,7 +300,9 @@ async function initMap() {
   const {Map, InfoWindow} = await loader.importLibrary('maps');
   const {Place} = await loader.importLibrary('places');
   const {Marker} = await loader.importLibrary('marker');
+
   markerService = Marker;
+
   // Attempt to get users geolocation
   navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 
