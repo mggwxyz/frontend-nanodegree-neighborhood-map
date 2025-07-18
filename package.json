@@ -20,6 +20,9 @@
     "url": "https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map/issues"
   },
   "homepage": "https://github.com/mggwxyz/frontend-nanodegree-neighborhood-map#readme",
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.10"
+  },
   "devDependencies": {
     "gh-pages": "^6.1.1",
     "sass": "^1.77.6",
@@ -27,8 +30,5 @@
   },
   "engines": {
     "node": ">=22.0.0"
-  },
-  "dependencies": {
-    "@googlemaps/js-api-loader": "^1.16.10"
   }
 }
