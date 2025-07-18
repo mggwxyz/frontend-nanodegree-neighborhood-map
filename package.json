@@ -1,6 +1,7 @@
 {
   "name": "frontend-nanodegreee-neighborhood-map",
   "version": "1.0.0",
+  "type": "module",
   "description": "A neighborhood map application for Udacity's Front-End Web Developer Nanodegree",
   "main": "./js/app.js",
   "scripts": {
@@ -22,7 +23,6 @@
   "devDependencies": {
     "gh-pages": "^6.1.1",
     "sass": "^1.77.6",
-    "terser": "^5.31.1",
     "vite": "^5.3.3"
   },
   "engines": {

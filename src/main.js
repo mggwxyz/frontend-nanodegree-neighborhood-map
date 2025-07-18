@@ -238,6 +238,11 @@ function ViewModel(searchText) {
     async function getPlaces(term) {
       self.loadingPlaces(true);
 
+      console.log(map);
+
+      console.log(map.getBounds());
+      console.log(map.getCenter());
+
       var request = {
         locationRestriction: map.getBounds(),
         textQuery: term,
@@ -251,8 +256,7 @@ function ViewModel(searchText) {
         ],
         language: 'en-US',
         maxResultCount: 8,
-        minRating: 3.2,
-        region: 'us'
+        minRating: 3.2
       };
 
       try {
@@ -310,6 +314,9 @@ async function initMap() {
   function geoSuccess(position) {
     //Initialize the map using the users location
     userPosition = position;
+
+    console.log(userPosition);
+
     map = new Map(document.getElementById('map'), {
       center: {
         lat: userPosition.coords.latitude,
