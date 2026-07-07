@@ -3,7 +3,7 @@
 import {Loader} from '@googlemaps/js-api-loader';
 import pWaitFor from 'p-wait-for';
 
-const API_KEY = 'AIzaSyCiBpLlS2nUY1NlBn1tM8If10sdIGm6o8I';
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const loader = new Loader({
   apiKey: API_KEY,
