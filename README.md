@@ -50,3 +50,5 @@ Users can filter out places and their markers by name by entering filters into t
 ### Getting More Information
 
 Users can get more information about a particular place by clicking on a place in the list view or its corresponding marker. These actions will cause an info window to popup above that respective place's map marker. The info window will contain the place's image, name, phone number, rating, and yelp link provided by Yelp's API.
+
+> Note: requires a Google Maps browser key in .env (see .env.example). The key formerly committed here has been removed from source; rotate/restrict any key you deploy via Google Cloud Console (HTTP referrer restriction).
